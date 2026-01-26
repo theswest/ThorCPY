@@ -33,7 +33,16 @@ Technical Features:
 
 ## Installation:
 
-Option 1: Run from Source:
+> To use ThorCPY, you must have **USB Debugging** enabled.
+> To install **USB Debugging**:
+> 1) On the device, go to Settings > About device.
+> 2) Tap the Build number seven times to make Settings > Developer options available.
+> 3) Then, enable the USB Debugging option from the Developer options
+
+Option 1: Standalone Executable    
+ - Prebuilt executables can be found in [Releases](https://github.com/theswest/ThorCPY/releases)
+
+Option 2: Run from Source:
 1) Clone the repository:
 	- `git clone https://github.com/theswest/ThorCPY.git`
 	- `cd ThorCPY`
@@ -41,9 +50,6 @@ Option 1: Run from Source:
 	- `pip install -r requirements.txt`
 3) Run ThorCPY
 	- `python main.py`
-
-Option 2: Standalone Executable    
- - Prebuilt executables can be found in [Releases](https://github.com/theswest/ThorCPY/releases)
 
 Option 3: Build from Source:
  1) Install PyInstaller:
