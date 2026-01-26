@@ -58,8 +58,8 @@ Technical Features:
 2) Run the build script:
 	- `python build.py`
 3) Find your executable:
-- Located in `dist/ThorCPY.exe`
-- Ensure that the executable must be placed in a folder with `bin/`, `config/` and `logs/`
+	- Located in `dist/ThorCPY.exe`
+	- Ensure that the executable must be placed in a folder with `bin/`, `config/` and `logs/`
 
 **Note:** scrcpy and ADB binaries are included in the `bin/` folder for your convenience.
 
