@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.png" alt="ThorCPY Logo" width="250">
+</p>
+
 # ThorCPY
 
 ThorCPY is a Windows-based multi-window Scrcpy launcher, designed specifically for the AYN Thor.
@@ -6,7 +10,12 @@ It features a layout editor, window docking, screenshots, and window moving.
 It launches two scrcpy windows (one for each display), and embeds them into a native windows container.
 Designed for screensharing, recording or livestreaming
 
----
+
+| Main UI                            | ThorCPY Screenshot                             |
+|------------------------------------|------------------------------------------------|
+| ![](assets/screenshots/main_ui.png) | ![](assets/screenshots/ThorCPY-Screenshot.png) |
+
+
 ## Features:
 
 - Custom dual-screen support built for the AYN Thor
@@ -22,7 +31,7 @@ Technical Features:
 - Graceful error handling and recovery
 - PyInstaller support for standalone executables
 
----
+
 ## Bundled Software:
 
 ThorCPY includes the following third-party software:
@@ -35,7 +44,7 @@ This bundled software is unmodified and used as-is for the convenience of end us
 
 To manually create the `bin` folder, simply extract the [latest release of scrcpy](https://github.com/Genymobile/scrcpy/releases/tag/v3.3.4) to `bin/`
 
----
+
 ## Requirements:
 
 System:
@@ -51,7 +60,7 @@ Python Dependencies:
 -  See [requirements.txt](https://github.com/theswest/ThorCPY/blob/master/requirements.txt) for the full list. Install with:
 	- `pip install -r requirements.txt`
 
----
+
 ## Installation:
 
 Option 1: Run from Source:
@@ -77,7 +86,7 @@ Option 3: Build from Source:
 
 **Note:** scrcpy and ADB binaries are included in the `bin/` folder for your convenience.
 
----
+
 ## Usage:
 
 Control Panel:
@@ -98,7 +107,7 @@ Control Panel:
 	 - Click "LOAD" next to a previously saved preset to apply it
 	 - Click "DEL" next to a previously saved preset to remove it
 
----
+
 ## Configuration:
 
 Layouts/Presets:
@@ -138,7 +147,7 @@ logging.basicConfig(
 	...
 )
 ```
----
+
 ## Troubleshooting:
 
 Device Not Found:
@@ -173,7 +182,7 @@ Missing DLL or Import Errors
  - Ensure Python 3.8+ is installed
  - Install Visual C++ Redistributables
 
----
+
 ## Licenses
 
  - This project is licensed under the **GNU General Public License v3.0** - see the LICENSE file for details, [here](https://github.com/theswest/ThorCPY/blob/master/bin/LICENSE).
@@ -181,14 +190,14 @@ Missing DLL or Import Errors
  - [Scrcpy](https://github.com/Genymobile/scrcpy) uses Apache License 2.0, which the LICENSE file can be found [here](https://github.com/theswest/ThorCPY/blob/master/bin/LICENSE_scrcpy.txt).
  - The font used in-app is [Cal Sans](https://github.com/calcom/font), which uses the SIL Open Font License 1.1. The LICENSE file can be found [here](https://github.com/theswest/ThorCPY/blob/master/assets/fonts/OFL.txt)
 
----
+
 ## Contributing:
 
 Contributions are more than welcome! This started as a personal project but it was released after several requests.
 Feel free to submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
 This was originally built as a quick personal tool, so refactoring PRs are especially welcome!
 
----
+
 ## Acknowledgements:
 
 - **[theeldermonkey](https://github.com/eldermonkey)** - For making the incredible logo
