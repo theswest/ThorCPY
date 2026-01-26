@@ -203,7 +203,7 @@ This was originally built as a quick personal tool, so refactoring PRs are espec
 
 ## Acknowledgements:
 
-- **[theeldermonkey](https://github.com/eldermonkey)** - For making the incredible logo
+- **[eldermonkey](https://github.com/eldermonkey)** - For making the incredible logo
 - **[scrcpy](https://github.com/Genymobile/scrcpy)** by Romain Vimont - The backend that makes this all possible
 - **[Cal Sans](https://github.com/calcom/font)** by Cal.com Inc. - UI typography (SIL Open Font License 1.1)
 - **[Pygame](https://www.pygame.org/)** - UI rendering and event handling
