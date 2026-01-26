@@ -31,6 +31,30 @@ Technical Features:
 - Graceful error handling and recovery
 - PyInstaller support for standalone executables
 
+## Installation:
+
+Option 1: Run from Source:
+1) Clone the repository:
+	- `git clone https://github.com/theswest/ThorCPY.git`
+	- `cd ThorCPY`
+2) Install Python dependencies:
+	- `pip install -r requirements.txt`
+3) Run ThorCPY
+	- `python main.py`
+
+Option 2: Standalone Executable    
+ - Prebuilt executables can be found in [Releases](https://github.com/theswest/ThorCPY/releases)
+
+Option 3: Build from Source:
+ 1) Install PyInstaller:
+	- `pip install pyinstaller`
+2) Run the build script:
+	- `python build.py`
+3) Find your executable:
+- Located in `dist/ThorCPY.exe`
+- Ensure that the executable must be placed in a folder with `bin/`, `config/` and `logs/`
+
+**Note:** scrcpy and ADB binaries are included in the `bin/` folder for your convenience.
 
 ## Bundled Software:
 
@@ -59,33 +83,6 @@ Included Dependencies:
 Python Dependencies:
 -  See [requirements.txt](https://github.com/theswest/ThorCPY/blob/master/requirements.txt) for the full list. Install with:
 	- `pip install -r requirements.txt`
-
-
-## Installation:
-
-Option 1: Run from Source:
-1) Clone the repository:
-	- `git clone https://github.com/theswest/ThorCPY.git`
-	- `cd ThorCPY`
-2) Install Python dependencies:
-	- `pip install -r requirements.txt`
-3) Run ThorCPY
-	- `python main.py`
-
-Option 2: Standalone Executable    
- - Prebuilt executables can be found in [Releases](https://github.com/theswest/ThorCPY/releases)
-
-Option 3: Build from Source:
- 1) Install PyInstaller:
-	- `pip install pyinstaller`
-2) Run the build script:
-	- `python build.py`
-3) Find your executable:
-- Located in `dist/ThorCPY.exe`
-- Ensure that the executable must be placed in a folder with `bin/`, `config/` and `logs/`
-
-**Note:** scrcpy and ADB binaries are included in the `bin/` folder for your convenience.
-
 
 ## Usage:
 
