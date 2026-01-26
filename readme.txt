@@ -199,7 +199,7 @@ Feel free to submit a pull request. For major changes, please open an issue firs
 
 Acknowledgements
 
-- theeldermonkey - For making the incredible logo
+- [theeldermonkey](https://github.com/eldermonkey) - For making the incredible logo
 - **[scrcpy](https://github.com/Genymobile/scrcpy)** by Romain Vimont - The backend that makes this all possible
 - **[Cal Sans](https://github.com/calcom/font)** by Cal.com Inc. - UI typography (SIL Open Font License 1.1)
 - **[Pygame](https://www.pygame.org/)** - UI rendering and event handling
