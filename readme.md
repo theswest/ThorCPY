@@ -1,11 +1,11 @@
- _________  __                        ______  _______  ____  ____  
+``` _________  __                        ______  _______  ____  ____  
 |  _   _  |[  |                     .' ___  ||_   __ \|_  _||_  _| 
 |_/ | | \_| | |--.   .--.   _ .--. / .'   \_|  | |__) | \ \  / /   
     | |     | .-. |/ .'`\ \[ `/'`\]| |         |  ___/   \ \/ /    
    _| |_    | | | || \__. | | |    \ `.___.'\ _| |_      _|  |_    
-  |_____|  [___]|__]'.__.' [___]    `.____ .'|_____|    |______|   
+  |_____|  [___]|__]'.__.' [___]    `.____ .'|_____|    |______|   ```
                                                                    
-=========================================================================================================
+===========================================================================
 
 ThorCPY is a Windows-based multi-window Scrcpy launcher, designed specifically for the AYN Thor.
 It features a layout editor, window docking, screenshots, and window moving.
@@ -13,7 +13,7 @@ It features a layout editor, window docking, screenshots, and window moving.
 It launches two scrcpy windows (one for each display), and embeds them into a native windows container.
 Designed for screensharing, recording or livestreaming
 
-=========================================================================================================
+===========================================================================
 
 Features:
  - Custom dual-screen support built for the AYN Thor
@@ -22,7 +22,7 @@ Features:
  - Screenshot capture takes a beautiful screenshot of both screens, including transparency where the screens aren't!
  - Real-time positioning allows you to move the screens around into whatever position you want
 
-=========================================================================================================
+===========================================================================
 
 Technical Features:
  - Comprehensive logging
@@ -31,7 +31,7 @@ Technical Features:
  - Graceful error handling and recovery
  - PyInstaller support for standalone executables
 
-=========================================================================================================
+===========================================================================
 
 ThorCPY includes the following third-party software:
 
@@ -42,7 +42,7 @@ ThorCPY includes the following third-party software:
 
 This bundled software is unmodified and used as-is for the convenience of end users.
 
-=========================================================================================================
+===========================================================================
 
 Requirements:
  - OS: Windows 10 (1809+) or Windows 11
@@ -54,7 +54,7 @@ Dependencies:
  - scrcpy binary (included in bin)
  - Python Dependencies (See requirements.txt)
 
-=========================================================================================================
+===========================================================================
 
 Installation:
 
@@ -85,7 +85,7 @@ Option 3: Build from Source:
 
 **Note:** scrcpy and ADB binaries are included in the `bin/` folder for your convenience.
 
-=========================================================================================================
+===========================================================================
 
 Usage:
 
@@ -110,7 +110,7 @@ Preset Management:
  - Click "LOAD" next to a previously saved preset to apply it
  - Click "DEL" next to a previously saved preset to remove it
 
-=========================================================================================================
+===========================================================================
 
 Configuration:
 
