@@ -39,10 +39,11 @@ Technical Features:
 > 2) **Tap the Build number seven times to make Settings > Developer options available.**
 > 3) **Then, enable the USB Debugging option from the Developer options.**
 
-Option 1: Standalone Executable    
+
+### Option 1: Standalone Executable    
  - Prebuilt executables can be found in [Releases](https://github.com/theswest/ThorCPY/releases)
 
-Option 2: Run from Source:
+### Option 2: Run from Source:
 1) Clone the repository:
 	- `git clone https://github.com/theswest/ThorCPY.git`
 	- `cd ThorCPY`
@@ -51,7 +52,7 @@ Option 2: Run from Source:
 3) Run ThorCPY
 	- `python main.py`
 
-Option 3: Build from Source:
+### Option 3: Build from Source:
  1) Install PyInstaller:
 	- `pip install pyinstaller`
 2) Run the build script:
