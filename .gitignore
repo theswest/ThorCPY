@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+ENV/
+env/
+
+# PyCharm
+.idea/
+
+# Logs
+logs/*.log
+logs/scrcpy_*.log
+
+# Config (keep the folder, ignore contents except example)
+config/*.json
+!config/layout_example.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts
+*.spec
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.bak
+~*
