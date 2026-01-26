@@ -1,5 +1,5 @@
 # ThorCPY 
-===========================================================================  
+---
   
 ThorCPY is a Windows-based multi-window Scrcpy launcher, designed specifically for the AYN Thor.  
 It features a layout editor, window docking, screenshots, and window moving.  
@@ -7,7 +7,7 @@ It features a layout editor, window docking, screenshots, and window moving.
 It launches two scrcpy windows (one for each display), and embeds them into a native windows container.  
 Designed for screensharing, recording or livestreaming  
   
-===========================================================================  
+---
   
 Features:  
  - Custom dual-screen support built for the AYN Thor  
@@ -16,7 +16,7 @@ Features:
  - Screenshot capture takes a beautiful screenshot of both screens, including transparency where the screens aren't!  
  - Real-time positioning allows you to move the screens around into whatever position you want  
   
-===========================================================================  
+---  
   
 Technical Features:  
  - Comprehensive logging  
@@ -25,7 +25,7 @@ Technical Features:
  - Graceful error handling and recovery  
  - PyInstaller support for standalone executables  
   
-===========================================================================  
+---  
   
 ThorCPY includes the following third-party software:  
   
@@ -36,7 +36,7 @@ ThorCPY includes the following third-party software:
   
 This bundled software is unmodified and used as-is for the convenience of end users.  
   
-===========================================================================  
+---
   
 Requirements:  
  - OS: Windows 10 (1809+) or Windows 11  
@@ -48,7 +48,7 @@ Dependencies:
  - scrcpy binary (included in bin)  
  - Python Dependencies (See requirements.txt)  
   
-===========================================================================  
+---  
   
 Installation:  
   
@@ -79,7 +79,7 @@ Option 3: Build from Source:
   
 **Note:** scrcpy and ADB binaries are included in the `bin/` folder for your convenience.  
   
-===========================================================================  
+---
   
 Usage:  
   
@@ -104,7 +104,7 @@ Preset Management:
  - Click "LOAD" next to a previously saved preset to apply it  
  - Click "DEL" next to a previously saved preset to remove it  
   
-===========================================================================  
+---  
   
 Configuration:  
   
@@ -141,7 +141,7 @@ To adjust log verbosity, modify the logging level in `main.py`:
 `logging.basicConfig(  
     level=logging.INFO,  # Change to DEBUG for more detail    ...)`  
   
-=========================================================================================================  
+---  
   
 Troubleshooting:  
   
@@ -156,14 +156,14 @@ Performance Issues:
  - Reduce the global scale - Close other resource-intensive applications - Use a USB 3 port - Lower the max FPS in launcher.py (change --max-fps) - Reduce the video bitrate in scrcpy_manager.py  
 Missing DLL or Import Errors  
  - Reinstall dependencies: pip install -r requirements.txt --force-reinstall - Ensure Python 3.8+ is installed - On Windows, install Visual C++ Redistributables  
-=========================================================================================================  
+---  
   
 Contributing:  
   
 Contributions are more than welcome! This was coded as a personal project but it was requested to be released, so please ignore any bad code.  
 Feel free to submit a pull request. For major changes, please open an issue first to discuss what you would like to change.  
   
-=========================================================================================================  
+---
   
 Acknowledgements  
   
