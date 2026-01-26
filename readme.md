@@ -33,7 +33,7 @@ ThorCPY includes the following third-party software:
 
 This bundled software is unmodified and used as-is for the convenience of end users.
 
-To manually create the `bin` folder, simply extract the latest [release of scrcpy](https://github.com/Genymobile/scrcpy/releases/tag/v3.3.4) to `bin/`
+To manually create the `bin` folder, simply extract the [latest release of scrcpy](https://github.com/Genymobile/scrcpy/releases/tag/v3.3.4) to `bin/`
 
 ---
 ## Requirements:
