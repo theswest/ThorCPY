@@ -33,11 +33,11 @@ Technical Features:
 
 ## Installation:
 
-> **To use ThorCPY, you must have USB Debugging enabled.**
-> **To install USB Debugging:**
-> **1) On the device, go to Settings > About device.**
-> **2) Tap the Build number seven times to make Settings > Developer options available.**
-> **3) Then, enable the USB Debugging option from the Developer options.**
+> **To use ThorCPY, you must have ***USB Debugging*** enabled.**
+> **To install ***USB Debugging***:**
+> 1) **On the device, go to Settings > About device.**
+> 2) **Tap the Build number seven times to make Settings > Developer options available.**
+> 3) **Then, enable the USB Debugging option from the Developer options.**
 
 Option 1: Standalone Executable    
  - Prebuilt executables can be found in [Releases](https://github.com/theswest/ThorCPY/releases)
