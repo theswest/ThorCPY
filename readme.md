@@ -1,6 +1,5 @@
 # ThorCPY 
----
-  
+
 ThorCPY is a Windows-based multi-window Scrcpy launcher, designed specifically for the AYN Thor.  
 It features a layout editor, window docking, screenshots, and window moving.  
   
