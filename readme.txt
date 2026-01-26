@@ -33,6 +33,17 @@ Technical Features:
 
 =========================================================================================================
 
+ThorCPY includes the following third-party software:
+
+- **scrcpy v3.3.4** by Genymobile/Romain Vimont
+  - Licensed under Apache License 2.0
+  - See `bin/LICENSE_scrcpy.txt` for full license text
+  - Source: https://github.com/Genymobile/scrcpy
+
+This bundled software is unmodified and used as-is for the convenience of end users.
+
+=========================================================================================================
+
 Requirements:
  - OS: Windows 10 (1809+) or Windows 11
  - Python 3.8 or higher when running from source
@@ -71,6 +82,8 @@ Option 3: Build from Source:
 3) Find your executable:
  - Located in `dist/ThorCPY.exe`
  - Ensure that the executable must be placed in a folder with bin/, config/ and logs/
+
+**Note:** scrcpy and ADB binaries are included in the `bin/` folder for your convenience.
 
 =========================================================================================================
 
