@@ -447,7 +447,7 @@ class PygameUI:
             # Undock/Dock Button
             undock_btn = pygame.Rect(40, 310, 180, 40)
             u_hover = undock_btn.collidepoint(mx, my)
-            btn_text = "DOCK WINDOWS" if not self.l.docked else "UNDOCK  WINDOWS"
+            btn_text = "DOCK  WINDOWS" if not self.l.docked else "UNDOCK  WINDOWS"
 
             btn_color = self.colors["panel"]
             text_color = self.colors["text"]
