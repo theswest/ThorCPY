@@ -19,6 +19,11 @@
 
 import ctypes
 from ctypes import wintypes
+import sys
+import logging
+
+# Setup logger for this module
+logger = logging.getLogger(__name__)
 
 # Load windows DLLs
 # Desktop Window Manager API
@@ -38,16 +43,19 @@ def enable_dark_titlebar(hwnd):
         hwnd: int, Handle to the window (HWND)
     """
     try:
-        # Set BOOL value to true
-        value = wintypes.BOOL(True)
+        version = sys.getwindowsversion().build
+        logger.info(f"Build retrieved, running build {version}")
+        if version < 18985:
+            DWMWA_USE_DARK_MODE = 19
+        else:
+            DWMWA_USE_DARK_MODE = 20
 
-        # Call DwmSetWindowAttribute to apply dark mode
+        value = wintypes.BOOL(True)
         dwmapi.DwmSetWindowAttribute(
             hwnd,
-            DWMWA_USE_IMMERSIVE_DARK_MODE,
+            DWMWA_USE_DARK_MODE,
             ctypes.byref(value),
             ctypes.sizeof(value)
         )
-
     except Exception as e:
-        print("Dark titlebar failed:", e)
+        logger.warning(f"Dark titlebar error: {e}")
