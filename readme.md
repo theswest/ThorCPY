@@ -8,7 +8,9 @@ ThorCPY is a Windows-based multi-window Scrcpy launcher, designed specifically f
 It features a layout editor, window docking, screenshots, and window moving.
 
 It launches two scrcpy windows (one for each display), and embeds them into a native windows container.
-Designed for screensharing, recording or livestreaming
+Designed for screensharing, recording or livestreaming.
+
+Tested extensively on Windows 11, it should work with Windows 10 (1809+) but there have been reports of issues, this is being investigated!
 
 
 | Main UI                            | ThorCPY Screenshot                             |
@@ -81,7 +83,7 @@ To manually create the `bin` folder, simply extract the [latest release of scrcp
 ## Requirements:
 
 System:
-- OS: Windows 10 (1809+) or Windows 11
+- OS: Windows 11 (Theoretically also Windows 10 (1809+))
 - Python 3.8 or higher when running from source
 - **Device**: AYN Thor with USB debugging enabled
 
