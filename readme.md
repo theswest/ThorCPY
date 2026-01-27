@@ -45,6 +45,7 @@ Technical Features:
  - Prebuilt executables can be found in [Releases](https://github.com/theswest/ThorCPY/releases)
 
 ### Option 2: Run from Source:
+> Note: Pygame does not have a wheel for Python 3.14 yet. Please use a lower version!
 1) Clone the repository:
 	- `git clone https://github.com/theswest/ThorCPY.git`
 	- `cd ThorCPY`
