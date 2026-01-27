@@ -291,6 +291,11 @@ def set_foreground_with_attach(hwnd):
         logger.warning("set_foreground_with_attach called without hwnd")
         return
 
+    # Validate window exists
+    if not user32.IsWindow(hwnd):
+        logger.warning(f"set_foreground_with_attach called with invalid hwnd: {hwnd}")
+        return
+
     try:
         logger.debug(f"Attempting to set foreground window: {hwnd}")
 
@@ -299,26 +304,50 @@ def set_foreground_with_attach(hwnd):
 
         logger.debug(f"Current thread: {tid_cur}, Target thread: {tid_target}")
 
+        # Check if same thread - no attachment needed
+        if tid_cur == tid_target:
+            logger.debug("Same thread - skipping AttachThreadInput")
+            try:
+                user32.SetForegroundWindow(hwnd)
+                logger.info(f"Window {hwnd} brought to foreground (same thread)")
+            except Exception as e:
+                logger.error(f"Error setting foreground window (same thread): {e}", exc_info=True)
+            return
+
+        # Check if target thread is valid
+        if not tid_target:
+            logger.warning("Could not get the target window's thread ID")
+            return
+
         attached = False
 
-        # Attach input queues
+        # Attach input queues with proper cleanup guarantee
         try:
             attached = bool(user32.AttachThreadInput(tid_cur, tid_target, True))
             if attached:
                 logger.debug("Thread input queues attached successfully")
             else:
-                logger.warning("Failed to attach thread input queues")
+                logger.warning("Failed to attach thread input queues - trying without attach")
+                # Try to set foreground anyway - sometimes works
+                try:
+                    user32.SetForegroundWindow(hwnd)
+                except:
+                    pass
+                return
+
         except Exception as e:
             logger.warning(f"Error attaching thread input: {e}")
             attached = False
+            return
 
-        # Force focus
+        # Force focus while attached
         try:
             result = user32.SetForegroundWindow(hwnd)
             if result:
                 logger.debug(f"SetForegroundWindow succeeded for hwnd {hwnd}")
             else:
-                logger.warning(f"SetForegroundWindow failed for hwnd {hwnd}")
+                error_code = kernel32.GetLastError()
+                logger.warning(f"SetForegroundWindow failed for hwnd {hwnd} (error: {error_code})")
 
             result = user32.SetActiveWindow(hwnd)
             if result:
@@ -336,14 +365,20 @@ def set_foreground_with_attach(hwnd):
 
         except Exception as e:
             logger.error(f"Error setting foreground window {hwnd}: {e}", exc_info=True)
+
         finally:
-            # Detach again
+            # Always detach, even if focus operations failed
             if attached:
                 try:
-                    user32.AttachThreadInput(tid_cur, tid_target, False)
-                    logger.debug("Thread input queues detached")
+                    detach_result = user32.AttachThreadInput(tid_cur, tid_target, False)
+                    if detach_result:
+                        logger.debug("Thread input queues detached successfully")
+                    else:
+                        error_code = kernel32.GetLastError()
+                        logger.warning(f"Failed to detach thread input queues (error: {error_code})")
                 except Exception as e:
-                    logger.warning(f"Error detaching thread input: {e}")
+                    # Log but don't raise - we did our best to clean up
+                    logger.error(f"CRITICAL: Error detaching thread input: {e}", exc_info=True)
 
     except Exception as e:
         logger.error(f"Error in set_foreground_with_attach for hwnd {hwnd}: {e}", exc_info=True)
