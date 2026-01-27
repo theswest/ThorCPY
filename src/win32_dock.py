@@ -18,6 +18,7 @@
 # src/win32_dock.py
 
 import ctypes
+import time
 import logging
 from ctypes import wintypes
 
@@ -67,6 +68,8 @@ class Win32Dock:
         self.hwnd_container = None
         self.hwnd_top = None
         self.hwnd_bottom = None
+        self._last_sync = 0
+        self._min_sync_interval = 0.016
         logger.debug("Win32Dock initialized with null window handles")
 
     def sync(self, tx, ty, bx, by, w1, h1, w2, h2, is_docked=True):
@@ -80,6 +83,13 @@ class Win32Dock:
             w2, h2: bottom window width/height
             is_docked: whether windows are docked inside container
         """
+
+        # Throttle rapid updates
+        now = time.time()
+        if now - self._last_sync < self._min_sync_interval:
+            return
+        self._last_sync = now
+
         if not (self.hwnd_top and self.hwnd_bottom):
             # Don't spam logs - only log first time
             if not hasattr(self, '_sync_warning_logged'):
