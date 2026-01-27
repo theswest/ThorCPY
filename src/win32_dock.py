@@ -278,7 +278,7 @@ def set_foreground_with_attach(hwnd):
         hwnd: Window handle to bring to foreground
     """
     if not hwnd:
-        logger.warning("set_foreground_with_attach called with null hwnd")
+        logger.warning("set_foreground_with_attach called without hwnd")
         return
 
     try:
@@ -320,7 +320,7 @@ def set_foreground_with_attach(hwnd):
             if result:
                 logger.debug(f"SetFocus succeeded for hwnd {hwnd}")
             else:
-                logger.debug(f"SetFocus returned null (may be normal)")
+                logger.debug(f"SetFocus returned null (might be normal)")
 
             logger.info(f"Window {hwnd} brought to foreground")
 

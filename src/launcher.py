@@ -103,11 +103,11 @@ class Launcher:
     """
     Main application controller for ThorCPY.
     Handles:
-    - Scrcpy device management
-    - Docking/undocking windows
-    - UI
-    - Layout saving/loading
-    - Windows visual enhancements
+        Scrcpy device management
+        Docking/undocking windows
+        UI
+        Layout saving/loading
+        Windows visual enhancements
     """
 
     def __init__(self):

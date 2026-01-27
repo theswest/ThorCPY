@@ -33,8 +33,9 @@ DWMWA_USE_IMMERSIVE_DARK_MODE = 20
 def enable_dark_titlebar(hwnd):
     """
     Enables dark mode titlebar for a specfic window
-    hwnd (int): Handle to the window (HWND)
     Works on windows 10 1809+ and Windows 11
+    Args:
+        hwnd: int, Handle to the window (HWND)
     """
     try:
         # Set BOOL value to true
