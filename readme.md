@@ -10,7 +10,7 @@ It features a layout editor, window docking, screenshots, and window moving.
 It launches two scrcpy windows (one for each display), and embeds them into a native windows container.
 Designed for screensharing, recording or livestreaming.
 
-Tested extensively on Windows 11, it should work with Windows 10 (1809+) but there have been reports of issues, this is being investigated!
+**Unfortunately, ThorCPY only supports Windows 11. A workaround for Windows 10 is in the works, but the current release *will not* work on Windows 10**
 
 
 | Main UI                            | ThorCPY Screenshot                             |
