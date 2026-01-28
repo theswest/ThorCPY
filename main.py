@@ -27,10 +27,59 @@ import os
 import sys
 import logging
 import time
-from src.launcher import Launcher
 
 # List of required folders that must exist in order to function
 REQUIRED_FOLDERS = ["bin", "config", "logs"]
+
+
+def check_windows_version():
+    """
+    Check if running on Windows 10 and show a warning.
+    Windows 11 has build number 22000 or higher.
+    Shows warning message if running on Windows 10 but allows continuation.
+    """
+    try:
+        version = sys.getwindowsversion()
+        build = version.build
+
+        # Windows 11 is build 22000+
+        # Windows 10 is builds 10240-19045
+        if build < 22000:
+            # Show warning dialog
+            try:
+                import tkinter as tk
+                from tkinter import messagebox
+                root = tk.Tk()
+                root.withdraw()
+                result = messagebox.showwarning(
+                    "Windows 10 Detected - Known Issues",
+                    f"WARNING: You are running Windows 10 (Build {build})\n\n"
+                    f"ThorCPY has known stability issues on Windows 10.\n"
+                    f"The control panel may crash when the window loses focus.\n\n"
+                    f"For the best experience, please upgrade to Windows 11.\n\n"
+                    f"Continue anyway?"
+                )
+                root.destroy()
+            except:
+                # Fallback to console message
+                print("=" * 60)
+                print("WARNING: Windows 10 Detected - Known Issues")
+                print("=" * 60)
+                print(f"You are running Windows 10 (Build {build})")
+                print(f"")
+                print(f"ThorCPY has known stability issues on Windows 10.")
+                print(f"The control panel may crash when the window loses focus.")
+                print(f"")
+                print(f"For the best experience, please upgrade to Windows 11.")
+                print("=" * 60)
+                input("\nPress Enter to continue anyway...")
+        else:
+            print(f"✓ Windows 11 detected (Build {build})")
+
+    except Exception as e:
+        print(f"Warning: Could not verify Windows version: {e}")
+        # Allow to continue if version check fails
+
 
 def check_runtime_structure():
     """
@@ -48,9 +97,6 @@ def check_runtime_structure():
         print("ThorCPY must be placed in a folder containing bin/, config/, logs/")
         input("Press Enter to exit...")
         sys.exit(1)
-
-# Run the folder check before launch
-check_runtime_structure()
 
 
 def setup_logging():
@@ -78,22 +124,36 @@ def setup_logging():
 def main():
     """
     Main entry point for the application
-    Sets DPI awareness, creates the launcher instance and starts the UI.
+    Checks Windows version, sets DPI awareness, creates the launcher instance and starts the UI.
     """
+
+    # Check Windows version and show warning if Windows 10
+    print(f"Starting {__app_name__} v{__version__}")
+    print("Checking system requirements...")
+    check_windows_version()
+
+    # Run the folder check
+    check_runtime_structure()
 
     # Sets up logging
     setup_logging()
     logger = logging.getLogger(__name__)
     logger.info(f"Starting {__app_name__} v{__version__}")
+    logger.info(
+        f"System: Windows {sys.getwindowsversion().major}.{sys.getwindowsversion().minor} Build {sys.getwindowsversion().build}")
 
     try:
         ctypes.windll.shcore.SetProcessDpiAwareness(1)
     except Exception:
         pass
 
+    # Import launcher after checks pass
+    from src.launcher import Launcher
+
     # Create the main launcher object and start it
     app = Launcher()
     app.launch()
+
 
 if __name__ == "__main__":
     main()
