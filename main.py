@@ -36,7 +36,7 @@ def check_windows_version():
     """
     Check if running on Windows 10 and show a warning.
     Windows 11 has build number 22000 or higher.
-    Shows warning message if running on Windows 10 but allows continuation.
+    Shows a warning message if running on Windows 10 but allows launch.
     """
     try:
         version = sys.getwindowsversion()
