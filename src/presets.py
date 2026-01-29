@@ -86,14 +86,14 @@ class PresetStore:
         invalid_chars = r'[<>:"/\\|?*\x00-\x1f]'
         if re.search(invalid_chars, name):
             logger.warning(
-                f"Preset name validation failed: contains invalid characters"
+                "Preset name validation failed: contains invalid characters"
             )
             return False, "Preset name contains invalid characters"
 
         # Prevent directory traversal
         if ".." in name or name.startswith("."):
             logger.warning(
-                f"Preset name validation failed: invalid format (directory traversal attempt?)"
+                "Preset name validation failed: invalid format (directory traversal attempt?)"
             )
             return False, "Invalid preset name format"
 

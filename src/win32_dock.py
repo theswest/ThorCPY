@@ -209,7 +209,7 @@ def apply_docked_style(hwnd):
         if not result:
             logger.warning(f"SetWindowLongW may have failed for hwnd {hwnd}")
         else:
-            logger.debug(f"Window style applied successfully")
+            logger.debug("Window style applied successfully")
 
     except Exception as e:
         logger.error(f"Error applying docked style to hwnd {hwnd}: {e}", exc_info=True)
@@ -273,7 +273,7 @@ def apply_undocked_style(hwnd):
         if not result:
             logger.warning(f"SetWindowLongW may have failed for hwnd {hwnd}")
         else:
-            logger.debug(f"Window style applied successfully")
+            logger.debug("Window style applied successfully")
 
         # Detach from container
         logger.debug(f"Detaching window {hwnd} from parent")

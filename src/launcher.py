@@ -7,15 +7,14 @@ import time
 import ctypes
 import pygame
 import os
-import sys
 import logging
 from ctypes import wintypes
 
 from src.scrcpy_manager import ScrcpyManager
-from src.win32_dock import Win32Dock, apply_docked_style, apply_undocked_style
+from src.win32_dock import Win32Dock, apply_docked_style
 from src.presets import PresetStore
 from src.config import ConfigManager
-from src.ui_pygame import show_loading_screen, resource_path
+from src.ui_pygame import show_loading_screen
 
 logger = logging.getLogger(__name__)
 

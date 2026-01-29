@@ -365,7 +365,7 @@ class ScrcpyManager:
                     f"Scrcpy {label} start attempt {attempt}/{self.scrcpy_retry_count} failed: {e}"
                 )
                 if attempt < self.scrcpy_retry_count:
-                    logger.debug(f"Waiting 0.7s before retry...")
+                    logger.debug("Waiting 0.7s before retry...")
                     time.sleep(0.7)
 
         # All attempts failed
