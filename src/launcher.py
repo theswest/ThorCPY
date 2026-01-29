@@ -21,6 +21,7 @@ import time
 import ctypes
 import pygame
 import os
+import sys
 import logging
 from ctypes import wintypes
 
@@ -57,10 +58,17 @@ DWMWA_SYSTEMBACKDROP_TYPE = 38
 DWMWCP_ROUND = 2
 DWMSBT_MICA = 2
 
+def is_windows_11():
+    """Check if running Windows 11 (build 22000+)"""
+    return sys.getwindowsversion().build >= 22000
 
 # Windows 11 visual helpers
 def enable_dark_titlebar(hwnd):
     """Enable dark titlebar for the given window"""
+    if not is_windows_11():
+        logger.debug(f"Skipping dark titlebar on Windows 10")
+        return
+
     try:
         val = ctypes.c_int(1)
         ctypes.windll.dwmapi.DwmSetWindowAttribute(
@@ -73,7 +81,11 @@ def enable_dark_titlebar(hwnd):
 
 
 def enable_rounded_corners(hwnd):
-    """Enable rounded corners for the window"""
+    """Enable rounded corners for the window (Windows 11+ only)"""
+    if not is_windows_11():
+        logger.debug(f"Skipping rounded corners on Windows 10")
+        return
+
     try:
         val = ctypes.c_int(DWMWCP_ROUND)
         ctypes.windll.dwmapi.DwmSetWindowAttribute(
@@ -86,7 +98,11 @@ def enable_rounded_corners(hwnd):
 
 
 def enable_mica(hwnd):
-    """Enable mica backdrop"""
+    """Enable mica backdrop (Windows 11+ only)"""
+    if not is_windows_11():
+        logger.debug(f"Skipping mica backdrop on Windows 10")
+        return
+
     try:
         val = ctypes.c_int(DWMSBT_MICA)
         ctypes.windll.dwmapi.DwmSetWindowAttribute(
