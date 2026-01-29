@@ -46,7 +46,7 @@ class ConfigManager:
             return {}
 
         try:
-            with open(self.path, 'r', encoding='utf-8') as f:
+            with open(self.path, "r", encoding="utf-8") as f:
                 config = json.load(f)
             logger.debug(f"Loaded config: {config}")
             return config
@@ -61,7 +61,7 @@ class ConfigManager:
         """Save config to disk"""
         try:
             logger.info(f"Saving config: {config}")
-            with open(self.path, 'w', encoding='utf-8') as f:
+            with open(self.path, "w", encoding="utf-8") as f:
                 json.dump(config, f, indent=4)
             logger.info("Config saved successfully")
         except Exception as e:

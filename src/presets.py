@@ -55,7 +55,9 @@ class PresetStore:
         if os.path.exists(self.path):
             logger.info(f"Preset file exists: {self.path}")
         else:
-            logger.info(f"Preset file does not exist yet (will be created on first save): {self.path}")
+            logger.info(
+                f"Preset file does not exist yet (will be created on first save): {self.path}"
+            )
 
     @staticmethod
     def validate_preset_name(name):
@@ -75,18 +77,24 @@ class PresetStore:
             return False, "Preset name cannot be empty"
 
         if len(name) > 50:
-            logger.warning(f"Preset name validation failed: too long ({len(name)} chars)")
+            logger.warning(
+                f"Preset name validation failed: too long ({len(name)} chars)"
+            )
             return False, "Preset name too long (max 50 characters)"
 
         # Check for invalid filesystem characters
         invalid_chars = r'[<>:"/\\|?*\x00-\x1f]'
         if re.search(invalid_chars, name):
-            logger.warning(f"Preset name validation failed: contains invalid characters")
+            logger.warning(
+                f"Preset name validation failed: contains invalid characters"
+            )
             return False, "Preset name contains invalid characters"
 
         # Prevent directory traversal
-        if '..' in name or name.startswith('.'):
-            logger.warning(f"Preset name validation failed: invalid format (directory traversal attempt?)")
+        if ".." in name or name.startswith("."):
+            logger.warning(
+                f"Preset name validation failed: invalid format (directory traversal attempt?)"
+            )
             return False, "Invalid preset name format"
 
         logger.debug(f"Preset name validation passed: '{name}'")
@@ -126,7 +134,7 @@ class PresetStore:
 
             # Save to file
             logger.debug(f"Writing presets to {self.path}")
-            with open(self.path, 'w', encoding='utf-8') as f:
+            with open(self.path, "w", encoding="utf-8") as f:
                 json.dump(presets, f, indent=4)
 
             logger.info(f"Successfully saved preset '{name}' with data: {data}")
@@ -161,7 +169,7 @@ class PresetStore:
                 logger.debug(f"Preset '{name}' removed from dictionary")
 
                 # Save updated presets
-                with open(self.path, 'w', encoding='utf-8') as f:
+                with open(self.path, "w", encoding="utf-8") as f:
                     json.dump(presets, f, indent=4)
 
                 logger.info(f"Successfully deleted preset: '{name}'")
@@ -177,7 +185,9 @@ class PresetStore:
             logger.error(f"IO error deleting preset '{name}': {e}", exc_info=True)
             raise
         except Exception as e:
-            logger.error(f"Unexpected error deleting preset '{name}': {e}", exc_info=True)
+            logger.error(
+                f"Unexpected error deleting preset '{name}': {e}", exc_info=True
+            )
             raise
 
     def load_all(self):
@@ -188,19 +198,23 @@ class PresetStore:
             dict: Dictionary of all presets, or empty dict if file doesn't exist or is invalid
         """
         if not os.path.exists(self.path):
-            logger.debug(f"Preset file does not exist: {self.path}, returning empty dict")
+            logger.debug(
+                f"Preset file does not exist: {self.path}, returning empty dict"
+            )
             return {}
 
         try:
             logger.debug(f"Loading presets from {self.path}")
-            with open(self.path, 'r', encoding='utf-8') as f:
+            with open(self.path, "r", encoding="utf-8") as f:
                 presets = json.load(f)
 
             if not isinstance(presets, dict):
                 logger.error(f"Preset file contains invalid data type: {type(presets)}")
                 return {}
 
-            logger.debug(f"Loaded {len(presets)} preset(s) from disk: {list(presets.keys())}")
+            logger.debug(
+                f"Loaded {len(presets)} preset(s) from disk: {list(presets.keys())}"
+            )
             return presets
 
         except json.JSONDecodeError as e:

@@ -46,7 +46,9 @@ class ScrcpyManager:
             adb_bin: optional custom path to adb binary
             enable_audio_top: if True, enable audio on top window
         """
-        logger.info(f"Initializing ScrcpyManager (scale={scale}, audio={enable_audio_top})")
+        logger.info(
+            f"Initializing ScrcpyManager (scale={scale}, audio={enable_audio_top})"
+        )
 
         self.scale = scale
         # Track popen instances
@@ -84,7 +86,9 @@ class ScrcpyManager:
         # General scrcpy config
         self.scrcpy_retry_count = 2
         self.scrcpy_start_delay = 1.0
-        logger.debug(f"Retry count: {self.scrcpy_retry_count}, Start delay: {self.scrcpy_start_delay}s")
+        logger.debug(
+            f"Retry count: {self.scrcpy_retry_count}, Start delay: {self.scrcpy_start_delay}s"
+        )
 
     # Binary resolution
     def _resolve_bin(self, name):
@@ -139,7 +143,7 @@ class ScrcpyManager:
                 [self.adb_bin, "start-server"],
                 capture_output=True,
                 text=True,
-                timeout=10
+                timeout=10,
             )
             if result.returncode != 0:
                 logger.warning(f"ADB start-server returned code {result.returncode}")
@@ -153,20 +157,22 @@ class ScrcpyManager:
         try:
             logger.debug("Querying connected devices")
             out = subprocess.check_output(
-                [self.adb_bin, "devices"],
-                text=True,
-                timeout=10
+                [self.adb_bin, "devices"], text=True, timeout=10
             )
             logger.debug(f"ADB devices output:\n{out}")
 
             lines = out.strip().splitlines()[1:]  # Skip header line
-            devices = [l.split()[0] for l in lines if "device" in l and "unauthorized" not in l]
+            devices = [
+                l.split()[0] for l in lines if "device" in l and "unauthorized" not in l
+            ]
 
             if devices:
                 self.serial = devices[0]
                 logger.info(f"Device detected: {self.serial}")
                 if len(devices) > 1:
-                    logger.info(f"Multiple devices found ({len(devices)}), using first: {self.serial}")
+                    logger.info(
+                        f"Multiple devices found ({len(devices)}), using first: {self.serial}"
+                    )
                 return self.serial
             else:
                 logger.warning("No devices found in ADB device list")
@@ -176,7 +182,9 @@ class ScrcpyManager:
         except subprocess.CalledProcessError as e:
             logger.error(f"ADB devices command failed: {e}", exc_info=True)
         except Exception as e:
-            logger.error(f"Unexpected error during device detection: {e}", exc_info=True)
+            logger.error(
+                f"Unexpected error during device detection: {e}", exc_info=True
+            )
 
         return None
 
@@ -206,7 +214,9 @@ class ScrcpyManager:
 
         if not self.serial:
             logger.error("Cannot start scrcpy: No device serial provided")
-            raise RuntimeError("No device serial provided to ScrcpyManager.start_scrcpy")
+            raise RuntimeError(
+                "No device serial provided to ScrcpyManager.start_scrcpy"
+            )
 
         if not self.scrcpy_bin:
             logger.error("Cannot start scrcpy: scrcpy binary not found")
@@ -217,22 +227,32 @@ class ScrcpyManager:
 
         # Base arguments for both windows
         base = [
-            self.scrcpy_bin, "-s", self.serial,
-            "--window-borderless", "--max-fps", "120",
-            "--render-driver", "opengl", "--mouse-bind=++++"
+            self.scrcpy_bin,
+            "-s",
+            self.serial,
+            "--window-borderless",
+            "--max-fps",
+            "120",
+            "--render-driver",
+            "opengl",
+            "--mouse-bind=++++",
         ]
 
         # Pick codecs & bitrates
-        bitrate_top = f"{max(8, int(32 * (self.scale ** 1.5)))}M"
-        bitrate_bottom = f"{max(6, int(24 * (self.scale ** 1.5)))}M"
+        bitrate_top = f"{max(8, int(32 * (self.scale**1.5)))}M"
+        bitrate_bottom = f"{max(6, int(24 * (self.scale**1.5)))}M"
         logger.info(f"Video bitrates - Top: {bitrate_top}, Bottom: {bitrate_bottom}")
 
         # Top window arguments
         top_args = base + [
-            "--display-id", "0",
-            "--window-title", "TF_T",
-            "--window-width", str(self.f_w1),
-            "--video-bit-rate", bitrate_top
+            "--display-id",
+            "0",
+            "--window-title",
+            "TF_T",
+            "--window-width",
+            str(self.f_w1),
+            "--video-bit-rate",
+            bitrate_top,
         ]
 
         if not self.enable_audio_top:
@@ -247,11 +267,15 @@ class ScrcpyManager:
 
         # Bottom window arguments (Always no audio)
         bottom_args = base + [
-            "--display-id", "4",
-            "--window-title", "TF_B",
-            "--window-width", str(self.f_w2),
-            "--video-bit-rate", bitrate_bottom,
-            "--no-audio"
+            "--display-id",
+            "4",
+            "--window-title",
+            "TF_B",
+            "--window-width",
+            str(self.f_w2),
+            "--video-bit-rate",
+            bitrate_bottom,
+            "--no-audio",
         ]
 
         if extra_bottom_args:
@@ -290,12 +314,16 @@ class ScrcpyManager:
         Raises:
             Exception: If all retry attempts fail
         """
-        logger.debug(f"Starting scrcpy {label} window with {self.scrcpy_retry_count} retry attempts")
+        logger.debug(
+            f"Starting scrcpy {label} window with {self.scrcpy_retry_count} retry attempts"
+        )
         last_exc = None
 
         for attempt in range(1, self.scrcpy_retry_count + 1):
             try:
-                logger.debug(f"Attempt {attempt}/{self.scrcpy_retry_count} for {label} window")
+                logger.debug(
+                    f"Attempt {attempt}/{self.scrcpy_retry_count} for {label} window"
+                )
 
                 # Prepare log file
                 logfile = None
@@ -314,31 +342,36 @@ class ScrcpyManager:
                 stderr = logfile if logfile else subprocess.DEVNULL
 
                 proc = subprocess.Popen(
-                    cmd,
-                    stdout=stdout,
-                    stderr=stderr,
-                    creationflags=CREATE_NO_WINDOW
+                    cmd, stdout=stdout, stderr=stderr, creationflags=CREATE_NO_WINDOW
                 )
 
                 # Give it a moment to fail if it's going to
                 time.sleep(0.3)
                 if proc.poll() is not None:
-                    raise RuntimeError(f"Scrcpy {label} process died immediately (exit code: {proc.poll()})")
+                    raise RuntimeError(
+                        f"Scrcpy {label} process died immediately (exit code: {proc.poll()})"
+                    )
 
                 # Start process hidden
                 self.processes.append(proc)
-                logger.info(f"Scrcpy {label} window started successfully (PID: {proc.pid})")
+                logger.info(
+                    f"Scrcpy {label} window started successfully (PID: {proc.pid})"
+                )
                 return proc
 
             except Exception as e:
                 last_exc = e
-                logger.warning(f"Scrcpy {label} start attempt {attempt}/{self.scrcpy_retry_count} failed: {e}")
+                logger.warning(
+                    f"Scrcpy {label} start attempt {attempt}/{self.scrcpy_retry_count} failed: {e}"
+                )
                 if attempt < self.scrcpy_retry_count:
                     logger.debug(f"Waiting 0.7s before retry...")
                     time.sleep(0.7)
 
         # All attempts failed
-        logger.error(f"All {self.scrcpy_retry_count} attempts to start scrcpy {label} window failed")
+        logger.error(
+            f"All {self.scrcpy_retry_count} attempts to start scrcpy {label} window failed"
+        )
         raise last_exc
 
     # Check if process is alive
@@ -352,7 +385,9 @@ class ScrcpyManager:
         for i, p in enumerate(self.processes):
             try:
                 if p.poll() is not None:
-                    logger.warning(f"Process {i} (PID: {p.pid}) is no longer alive (exit code: {p.poll()})")
+                    logger.warning(
+                        f"Process {i} (PID: {p.pid}) is no longer alive (exit code: {p.poll()})"
+                    )
                     return p
             except Exception as e:
                 logger.error(f"Error checking process {i} status: {e}")
@@ -393,7 +428,9 @@ class ScrcpyManager:
                     p.wait(timeout=2)
                     logger.debug(f"Process {i} (PID: {p.pid}) terminated gracefully")
             except subprocess.TimeoutExpired:
-                logger.warning(f"Process {i} (PID: {p.pid}) did not terminate, forcing kill")
+                logger.warning(
+                    f"Process {i} (PID: {p.pid}) did not terminate, forcing kill"
+                )
                 try:
                     p.kill()
                     logger.debug(f"Process {i} killed with p.kill()")
@@ -401,9 +438,9 @@ class ScrcpyManager:
                     logger.error(f"Failed to kill process {i}: {e}")
                     try:
                         subprocess.run(
-                            ['taskkill', '/F', '/T', '/PID', str(p.pid)],
+                            ["taskkill", "/F", "/T", "/PID", str(p.pid)],
                             capture_output=True,
-                            timeout=5
+                            timeout=5,
                         )
                         logger.debug(f"Process {i} killed with taskkill")
                     except Exception as e2:
@@ -424,14 +461,24 @@ class ScrcpyManager:
             try:
                 logger.debug("Killing scrcpy-server on device")
                 result = subprocess.run(
-                    [self.adb_bin, "-s", self.serial, "shell", "pkill", "-f", "scrcpy-server"],
+                    [
+                        self.adb_bin,
+                        "-s",
+                        self.serial,
+                        "shell",
+                        "pkill",
+                        "-f",
+                        "scrcpy-server",
+                    ],
                     capture_output=True,
-                    timeout=3
+                    timeout=3,
                 )
                 if result.returncode == 0:
                     logger.debug("scrcpy-server killed successfully")
                 else:
-                    logger.debug(f"pkill scrcpy-server returned {result.returncode} (may not have been running)")
+                    logger.debug(
+                        f"pkill scrcpy-server returned {result.returncode} (may not have been running)"
+                    )
             except subprocess.TimeoutExpired:
                 logger.warning("Timeout killing scrcpy-server")
             except Exception as e:
@@ -441,14 +488,24 @@ class ScrcpyManager:
             try:
                 logger.debug("Killing app_process on device")
                 result = subprocess.run(
-                    [self.adb_bin, "-s", self.serial, "shell", "pkill", "-f", "app_process"],
+                    [
+                        self.adb_bin,
+                        "-s",
+                        self.serial,
+                        "shell",
+                        "pkill",
+                        "-f",
+                        "app_process",
+                    ],
                     capture_output=True,
-                    timeout=3
+                    timeout=3,
                 )
                 if result.returncode == 0:
                     logger.debug("app_process killed successfully")
                 else:
-                    logger.debug(f"pkill app_process returned {result.returncode} (may not have been running)")
+                    logger.debug(
+                        f"pkill app_process returned {result.returncode} (may not have been running)"
+                    )
             except subprocess.TimeoutExpired:
                 logger.warning("Timeout killing app_process")
             except Exception as e:
@@ -460,7 +517,7 @@ class ScrcpyManager:
                 subprocess.run(
                     [self.adb_bin, "-s", self.serial, "forward", "--remove-all"],
                     capture_output=True,
-                    timeout=3
+                    timeout=3,
                 )
                 logger.debug("Port forwards removed")
             except Exception as e:
@@ -472,7 +529,7 @@ class ScrcpyManager:
                 subprocess.run(
                     [self.adb_bin, "-s", self.serial, "reverse", "--remove-all"],
                     capture_output=True,
-                    timeout=3
+                    timeout=3,
                 )
                 logger.debug("Reverse forwards removed")
             except Exception as e:

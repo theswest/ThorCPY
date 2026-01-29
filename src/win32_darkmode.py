@@ -52,10 +52,7 @@ def enable_dark_titlebar(hwnd):
 
         value = wintypes.BOOL(True)
         dwmapi.DwmSetWindowAttribute(
-            hwnd,
-            DWMWA_USE_DARK_MODE,
-            ctypes.byref(value),
-            ctypes.sizeof(value)
+            hwnd, DWMWA_USE_DARK_MODE, ctypes.byref(value), ctypes.sizeof(value)
         )
     except Exception as e:
         logger.warning(f"Dark titlebar error: {e}")

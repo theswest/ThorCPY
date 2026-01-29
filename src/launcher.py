@@ -19,13 +19,7 @@ from src.ui_pygame import show_loading_screen, resource_path
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_LAYOUT = {
-    "tx": 0,
-    "ty": 0,
-    "bx": 0,
-    "by": 0,
-    "global_scale": 0.6
-}
+DEFAULT_LAYOUT = {"tx": 0, "ty": 0, "bx": 0, "by": 0, "global_scale": 0.6}
 
 # Win32 Constants
 WM_CLOSE = 0x0010
@@ -50,7 +44,9 @@ class Launcher:
         self.config = ConfigManager("config/config.json")
 
         # 2. PERSIST SCALE: Load scale from config, fall back to default if missing
-        self.global_scale = self.config.get("global_scale", DEFAULT_LAYOUT["global_scale"])
+        self.global_scale = self.config.get(
+            "global_scale", DEFAULT_LAYOUT["global_scale"]
+        )
         self.launch_scale = self.global_scale
 
         # 3. Initialize Scrcpy with the saved scale
@@ -72,7 +68,9 @@ class Launcher:
         # Math: (TopWidth / 2) - (BottomWidth / 2)
         self.bx = int((w1 / 2) - (w2 / 2))
 
-        logger.info(f"Layout Reset: Top(0,0), Bottom({self.bx}, {self.by}) at Scale {self.global_scale}")
+        logger.info(
+            f"Layout Reset: Top(0,0), Bottom({self.bx}, {self.by}) at Scale {self.global_scale}"
+        )
 
         self.dock = Win32Dock()
         self.running = False
@@ -86,7 +84,12 @@ class Launcher:
         self.WPARAM = ctypes.c_ulonglong
         self.LPARAM = ctypes.c_longlong
         try:
-            self.user32.DefWindowProcW.argtypes = [wintypes.HWND, wintypes.UINT, self.WPARAM, self.LPARAM]
+            self.user32.DefWindowProcW.argtypes = [
+                wintypes.HWND,
+                wintypes.UINT,
+                self.WPARAM,
+                self.LPARAM,
+            ]
             self.user32.DefWindowProcW.restype = self.LRESULT
         except:
             pass
@@ -108,7 +111,9 @@ class Launcher:
         self.config.set("global_scale", self.global_scale)
 
     def _create_wnd_proc(self):
-        WNDPROC = ctypes.WINFUNCTYPE(self.LRESULT, wintypes.HWND, wintypes.UINT, self.WPARAM, self.LPARAM)
+        WNDPROC = ctypes.WINFUNCTYPE(
+            self.LRESULT, wintypes.HWND, wintypes.UINT, self.WPARAM, self.LPARAM
+        )
 
         def py_wndproc(hwnd, msg, wp, lp):
             if msg in (WM_CLOSE, WM_DESTROY):
@@ -122,14 +127,22 @@ class Launcher:
         def loop():
             while self.scrcpy.f_w1 == 0:
                 time.sleep(0.1)
-                if not self.running: return
+                if not self.running:
+                    return
 
             class WNDCLASSEX(ctypes.Structure):
                 _fields_ = [
-                    ("cbSize", wintypes.UINT), ("style", wintypes.UINT), ("lpfnWndProc", ctypes.c_void_p),
-                    ("cbClsExtra", ctypes.c_int), ("cbWndExtra", ctypes.c_int), ("hInstance", wintypes.HINSTANCE),
-                    ("hIcon", wintypes.HANDLE), ("hCursor", wintypes.HANDLE), ("hbrBackground", wintypes.HANDLE),
-                    ("lpszMenuName", wintypes.LPCWSTR), ("lpszClassName", wintypes.LPCWSTR),
+                    ("cbSize", wintypes.UINT),
+                    ("style", wintypes.UINT),
+                    ("lpfnWndProc", ctypes.c_void_p),
+                    ("cbClsExtra", ctypes.c_int),
+                    ("cbWndExtra", ctypes.c_int),
+                    ("hInstance", wintypes.HINSTANCE),
+                    ("hIcon", wintypes.HANDLE),
+                    ("hCursor", wintypes.HANDLE),
+                    ("hbrBackground", wintypes.HANDLE),
+                    ("lpszMenuName", wintypes.LPCWSTR),
+                    ("lpszClassName", wintypes.LPCWSTR),
                     ("hIconSm", wintypes.HANDLE),
                 ]
 
@@ -149,12 +162,23 @@ class Launcher:
 
             rect = wintypes.RECT(0, 0, int(client_w), int(client_h))
             style = WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-            self.user32.AdjustWindowRectEx(ctypes.byref(rect), style, False, WS_EX_CONTROLPARENT)
+            self.user32.AdjustWindowRectEx(
+                ctypes.byref(rect), style, False, WS_EX_CONTROLPARENT
+            )
 
             hwnd = self.user32.CreateWindowExW(
-                WS_EX_CONTROLPARENT, "ThorFinalBridge", "ThorCPY", style,
-                100, 100, rect.right - rect.left, rect.bottom - rect.top,
-                None, 0, ctypes.c_void_p(hinst), None
+                WS_EX_CONTROLPARENT,
+                "ThorFinalBridge",
+                "ThorCPY",
+                style,
+                100,
+                100,
+                rect.right - rect.left,
+                rect.bottom - rect.top,
+                None,
+                0,
+                ctypes.c_void_p(hinst),
+                None,
             )
 
             if hwnd:
@@ -163,7 +187,9 @@ class Launcher:
                 self.user32.ShowWindow(hwnd, SW_SHOW)
 
             msg = wintypes.MSG()
-            while self.running and self.user32.GetMessageW(ctypes.byref(msg), None, 0, 0):
+            while self.running and self.user32.GetMessageW(
+                ctypes.byref(msg), None, 0, 0
+            ):
                 self.user32.TranslateMessage(ctypes.byref(msg))
                 self.user32.DispatchMessageW(ctypes.byref(msg))
 
@@ -201,31 +227,45 @@ class Launcher:
         threading.Thread(target=self._docking_monitor, daemon=True).start()
 
         from src.ui_pygame import PygameUI
+
         pygame.init()
         self.ui = PygameUI(self)
         clock = pygame.time.Clock()
 
         while self.running:
             for ev in pygame.event.get():
-                if ev.type == pygame.QUIT: self.stop()
+                if ev.type == pygame.QUIT:
+                    self.stop()
                 self.ui.handle_event(ev)
 
             # Continuous sync using our forced BX/BY values
             if self.dock.hwnd_top or self.dock.hwnd_bottom:
-                self.dock.sync(self.tx, self.ty, self.bx, self.by,
-                               self.scrcpy.f_w1, self.scrcpy.f_h1,
-                               self.scrcpy.f_w2, self.scrcpy.f_h2,
-                               is_docked=self.docked)
+                self.dock.sync(
+                    self.tx,
+                    self.ty,
+                    self.bx,
+                    self.by,
+                    self.scrcpy.f_w1,
+                    self.scrcpy.f_h1,
+                    self.scrcpy.f_w2,
+                    self.scrcpy.f_h2,
+                    is_docked=self.docked,
+                )
             self.ui.render()
             clock.tick(60)
 
     def stop(self):
-        if not self.running: return
+        if not self.running:
+            return
         self.running = False
         self.save_layout()
         import subprocess
-        subprocess.run(["taskkill", "/F", "/IM", "scrcpy.exe", "/T"],
-                       capture_output=True, creationflags=0x08000000)
+
+        subprocess.run(
+            ["taskkill", "/F", "/IM", "scrcpy.exe", "/T"],
+            capture_output=True,
+            creationflags=0x08000000,
+        )
         pygame.quit()
         if self.hwnd_container:
             self.user32.PostMessageW(self.hwnd_container, WM_CLOSE, 0, 0)

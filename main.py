@@ -17,7 +17,7 @@
 
 # main.py
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 __app_name__ = "ThorCPY"
 __author__ = "the_swest"
 __description__ = "AYN Thor screen mirroring and docking tool"
@@ -49,6 +49,7 @@ def check_windows_version():
             try:
                 import tkinter as tk
                 from tkinter import messagebox
+
                 root = tk.Tk()
                 root.withdraw()
                 result = messagebox.showwarning(
@@ -56,7 +57,7 @@ def check_windows_version():
                     f"WARNING: You are running Windows 10 (Build {build})\n\n"
                     f"ThorCPY has been reported to have stability issues on Windows 10.\n"
                     f"For the best experience, please upgrade to Windows 11.\n\n"
-                    f"Continue anyway?"
+                    f"Continue anyway?",
                 )
                 root.destroy()
             except:
@@ -104,7 +105,7 @@ def setup_logging():
     """
     log_dir = os.path.join(
         os.path.dirname(sys.executable if hasattr(sys, "_MEIPASS") else __file__),
-        "logs"
+        "logs",
     )
     os.makedirs(log_dir, exist_ok=True)
 
@@ -112,11 +113,11 @@ def setup_logging():
 
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[
-            logging.FileHandler(log_file, encoding='utf-8'),
-            logging.StreamHandler()
-        ]
+            logging.FileHandler(log_file, encoding="utf-8"),
+            logging.StreamHandler(),
+        ],
     )
 
 
@@ -139,7 +140,8 @@ def main():
     logger = logging.getLogger(__name__)
     logger.info(f"Starting {__app_name__} v{__version__}")
     logger.info(
-        f"System: Windows {sys.getwindowsversion().major}.{sys.getwindowsversion().minor} Build {sys.getwindowsversion().build}")
+        f"System: Windows {sys.getwindowsversion().major}.{sys.getwindowsversion().minor} Build {sys.getwindowsversion().build}"
+    )
 
     try:
         ctypes.windll.shcore.SetProcessDpiAwareness(1)

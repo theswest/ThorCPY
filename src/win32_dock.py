@@ -92,7 +92,7 @@ class Win32Dock:
 
         if not (self.hwnd_top and self.hwnd_bottom):
             # Don't spam logs - only log first time
-            if not hasattr(self, '_sync_warning_logged'):
+            if not hasattr(self, "_sync_warning_logged"):
                 logger.debug("Sync skipped: window handles not available yet")
                 self._sync_warning_logged = True
             return
@@ -103,30 +103,36 @@ class Win32Dock:
 
             if is_docked:
                 # Child windows are drawn relative to container client area
-                logger.debug(f"Syncing docked windows - Top: ({tx}, {ty}, {w1}x{h1}), Bottom: ({bx}, {by}, {w2}x{h2})")
+                logger.debug(
+                    f"Syncing docked windows - Top: ({tx}, {ty}, {w1}x{h1}), Bottom: ({bx}, {by}, {w2}x{h2})"
+                )
 
                 result_top = user32.SetWindowPos(
-                    self.hwnd_top, 0,
-                    int(tx), int(ty), int(w1), int(h1),
-                    flags
+                    self.hwnd_top, 0, int(tx), int(ty), int(w1), int(h1), flags
                 )
                 if not result_top:
-                    logger.warning(f"SetWindowPos failed for top window (hwnd={self.hwnd_top})")
+                    logger.warning(
+                        f"SetWindowPos failed for top window (hwnd={self.hwnd_top})"
+                    )
 
                 result_bottom = user32.SetWindowPos(
-                    self.hwnd_bottom, 0,
-                    int(bx), int(by), int(w2), int(h2),
-                    flags
+                    self.hwnd_bottom, 0, int(bx), int(by), int(w2), int(h2), flags
                 )
                 if not result_bottom:
-                    logger.warning(f"SetWindowPos failed for bottom window (hwnd={self.hwnd_bottom})")
+                    logger.warning(
+                        f"SetWindowPos failed for bottom window (hwnd={self.hwnd_bottom})"
+                    )
 
             else:
                 # For undocked mode, offset is decided by container's screen position
                 if self.hwnd_container:
                     rect = wintypes.RECT()
-                    if not user32.GetWindowRect(self.hwnd_container, ctypes.byref(rect)):
-                        logger.warning(f"GetWindowRect failed for container (hwnd={self.hwnd_container})")
+                    if not user32.GetWindowRect(
+                        self.hwnd_container, ctypes.byref(rect)
+                    ):
+                        logger.warning(
+                            f"GetWindowRect failed for container (hwnd={self.hwnd_container})"
+                        )
                         return
 
                     screen_tx = rect.left + int(tx)
@@ -135,17 +141,20 @@ class Win32Dock:
                     screen_by = rect.top + int(by)
 
                     logger.debug(
-                        f"Syncing undocked windows - Top: ({screen_tx}, {screen_ty}), Bottom: ({screen_bx}, {screen_by})")
+                        f"Syncing undocked windows - Top: ({screen_tx}, {screen_ty}), Bottom: ({screen_bx}, {screen_by})"
+                    )
 
                     user32.SetWindowPos(
-                        self.hwnd_top, 0,
-                        screen_tx, screen_ty, int(w1), int(h1),
-                        flags
+                        self.hwnd_top, 0, screen_tx, screen_ty, int(w1), int(h1), flags
                     )
                     user32.SetWindowPos(
-                        self.hwnd_bottom, 0,
-                        screen_bx, screen_by, int(w2), int(h2),
-                        flags
+                        self.hwnd_bottom,
+                        0,
+                        screen_bx,
+                        screen_by,
+                        int(w2),
+                        int(h2),
+                        flags,
                     )
                 else:
                     logger.warning("Cannot sync undocked windows: no container handle")
@@ -181,11 +190,17 @@ def apply_docked_style(hwnd):
         logger.debug(f"Current window style: 0x{style:08x}")
 
         # Remove all decorations
-        style &= ~(WS_BORDER | WS_CAPTION | WS_THICKFRAME |
-                   WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU)
+        style &= ~(
+            WS_BORDER
+            | WS_CAPTION
+            | WS_THICKFRAME
+            | WS_MINIMIZEBOX
+            | WS_MAXIMIZEBOX
+            | WS_SYSMENU
+        )
 
         # Add child mode + clipping
-        style |= (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
+        style |= WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
 
         logger.debug(f"New window style: 0x{style:08x}")
 
@@ -203,8 +218,13 @@ def apply_docked_style(hwnd):
     try:
         logger.debug(f"Forcing frame change for hwnd {hwnd}")
         result = user32.SetWindowPos(
-            hwnd, 0, 0, 0, 0, 0,
-            SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE
+            hwnd,
+            0,
+            0,
+            0,
+            0,
+            0,
+            SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE,
         )
         if not result:
             logger.warning(f"SetWindowPos frame change may have failed for hwnd {hwnd}")
@@ -264,8 +284,13 @@ def apply_undocked_style(hwnd):
         # Force windows to redraw borders/title bar
         logger.debug(f"Forcing frame change for hwnd {hwnd}")
         result = user32.SetWindowPos(
-            hwnd, 0, 0, 0, 0, 0,
-            SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE
+            hwnd,
+            0,
+            0,
+            0,
+            0,
+            0,
+            SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE,
         )
         if not result:
             logger.warning(f"SetWindowPos frame change may have failed for hwnd {hwnd}")
@@ -273,7 +298,9 @@ def apply_undocked_style(hwnd):
             logger.info(f"Undocked style applied successfully to hwnd {hwnd}")
 
     except Exception as e:
-        logger.error(f"Error applying undocked style to hwnd {hwnd}: {e}", exc_info=True)
+        logger.error(
+            f"Error applying undocked style to hwnd {hwnd}: {e}", exc_info=True
+        )
 
 
 # Focus / Input Manager
@@ -301,7 +328,9 @@ def set_foreground_with_attach(hwnd):
                 user32.SetForegroundWindow(hwnd)
                 logger.info(f"Window {hwnd} brought to foreground (same thread)")
             except Exception as e:
-                logger.error(f"Error setting foreground window (same thread): {e}", exc_info=True)
+                logger.error(
+                    f"Error setting foreground window (same thread): {e}", exc_info=True
+                )
             return
 
         # Validate target thread
@@ -313,7 +342,9 @@ def set_foreground_with_attach(hwnd):
         try:
             result = user32.SetForegroundWindow(hwnd)
             if result:
-                logger.info(f"Window {hwnd} brought to foreground (no attachment needed)")
+                logger.info(
+                    f"Window {hwnd} brought to foreground (no attachment needed)"
+                )
                 return
         except:
             pass
@@ -336,9 +367,13 @@ def set_foreground_with_attach(hwnd):
                     user32.SetForegroundWindow(hwnd)
                     user32.SetActiveWindow(hwnd)
                     user32.SetFocus(hwnd)
-                    logger.info(f"Window {hwnd} brought to foreground (with attachment)")
+                    logger.info(
+                        f"Window {hwnd} brought to foreground (with attachment)"
+                    )
                 except Exception as e:
-                    logger.error(f"Error setting foreground window {hwnd}: {e}", exc_info=True)
+                    logger.error(
+                        f"Error setting foreground window {hwnd}: {e}", exc_info=True
+                    )
 
         except Exception as e:
             logger.warning(f"Error during thread attachment: {e}")
@@ -349,16 +384,24 @@ def set_foreground_with_attach(hwnd):
                 max_detach_attempts = 3
                 for attempt in range(max_detach_attempts):
                     try:
-                        detach_result = user32.AttachThreadInput(tid_cur, tid_target, False)
+                        detach_result = user32.AttachThreadInput(
+                            tid_cur, tid_target, False
+                        )
                         if detach_result:
-                            logger.debug(f"Thread input queues detached (attempt {attempt + 1})")
+                            logger.debug(
+                                f"Thread input queues detached (attempt {attempt + 1})"
+                            )
                             break
                         else:
                             time.sleep(0.01)  # Brief delay before retry
                     except Exception as e:
                         logger.error(f"Detach attempt {attempt + 1} failed: {e}")
                         if attempt == max_detach_attempts - 1:
-                            logger.critical("FAILED TO DETACH THREAD INPUT - POTENTIAL INSTABILITY")
+                            logger.critical(
+                                "FAILED TO DETACH THREAD INPUT - POTENTIAL INSTABILITY"
+                            )
 
     except Exception as e:
-        logger.error(f"Critical error in set_foreground_with_attach: {e}", exc_info=True)
+        logger.error(
+            f"Critical error in set_foreground_with_attach: {e}", exc_info=True
+        )
