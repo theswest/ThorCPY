@@ -16,12 +16,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # src/config.py
+
 import json
 import os
 import logging
 
-logger = logging.getLogger(__name__)
+JSON_INDENT = 4
+DEFAULT_ENCODING = "utf-8"
 
+logger = logging.getLogger(__name__)
 
 class ConfigManager:
     """Manages global configuration settings"""
@@ -35,8 +38,8 @@ class ConfigManager:
             dir_path = os.path.dirname(self.path)
             if dir_path:
                 os.makedirs(dir_path, exist_ok=True)
-        except Exception as e:
-            logger.error(f"Failed to create config directory: {e}", exc_info=True)
+        except Exception as directoryError:
+            logger.error(f"Failed to create config directory: {directoryError}", exc_info=True)
             raise
 
     def load(self):
@@ -46,26 +49,26 @@ class ConfigManager:
             return {}
 
         try:
-            with open(self.path, "r", encoding="utf-8") as f:
-                config = json.load(f)
+            with open(self.path, "r", encoding="utf-8") as file:
+                config = json.load(file)
             logger.debug(f"Loaded config: {config}")
             return config
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON decode error reading {self.path}: {e}", exc_info=True)
+        except json.JSONDecodeError as JSONDecodeError:
+            logger.error(f"JSON decode error reading {self.path}: {JSONDecodeError}", exc_info=True)
             return {}
-        except Exception as e:
-            logger.error(f"Error loading config: {e}", exc_info=True)
+        except Exception as JSONDecodeException:
+            logger.error(f"Error loading config: {JSONDecodeException}", exc_info=True)
             return {}
 
     def save(self, config):
         """Save config to disk"""
         try:
             logger.info(f"Saving config: {config}")
-            with open(self.path, "w", encoding="utf-8") as f:
-                json.dump(config, f, indent=4)
+            with open(self.path, "w", encoding=DEFAULT_ENCODING) as file:
+                json.dump(config, file, indent=JSON_INDENT)
             logger.info("Config saved successfully")
-        except Exception as e:
-            logger.error(f"Failed to save config: {e}", exc_info=True)
+        except Exception as SaveConfigError:
+            logger.error(f"Failed to save config: {SaveConfigError}", exc_info=True)
             raise
 
     def get(self, key, default=None):
