@@ -27,10 +27,12 @@ import os
 import sys
 import logging
 import time
+from src.launcher import Launcher
 
 # List of required folders that must exist in order to function
 REQUIRED_FOLDERS = ["bin", "config", "logs"]
-
+WIN11_LOWEST_BUILD = 22000
+LOG_MULT = 60
 
 def check_windows_version():
     """
@@ -44,7 +46,7 @@ def check_windows_version():
 
         # Windows 11 is build 22000+
         # Windows 10 is builds 10240-19045
-        if build < 22000:
+        if build < WIN11_LOWEST_BUILD:
             # Show warning dialog
             try:
                 import tkinter as tk
@@ -60,43 +62,64 @@ def check_windows_version():
                     f"Continue anyway?",
                 )
                 root.destroy()
-            except Exception as tk_err:
+            except Exception as tkErr:
                 # Fallback to console message
-                print("=" * 60)
+                print("=" * LOG_MULT)
                 print("WARNING: Windows 10 Detected - Unstable Build with Known Issues")
-                print("=" * 60)
+                print("=" * LOG_MULT)
                 print(f"You are running Windows 10 (Build {build})")
                 print("")
                 print("ThorCPY has known stability issues on Windows 10.")
                 print("")
                 print("For the best experience, please upgrade to Windows 11.")
-                print("=" * 60)
-                print(f"(GUI warning failed: {tk_err})")
+                print("=" * LOG_MULT)
+                print(f"(GUI warning failed: {tkErr})")
                 input("\nPress Enter to continue anyway...")
         else:
             print(f"✓ Windows 11 detected (Build {build})")
 
-    except Exception as e:
-        print(f"Warning: Could not verify Windows version: {e}")
+    except Exception as WinDetectionError:
+        print(f"Warning: Could not verify Windows version: {WinDetectionError}")
         # Allow to continue if version check fails
+
+
+def show_fatal_error(title: str, message: str):
+    """Show a blocking Windows error dialog."""
+    ctypes.windll.user32.MessageBoxW(
+        None,
+        message,
+        title,
+        0x10  # MB_ICONERROR
+    )
 
 
 def check_runtime_structure():
     """
     Checks that all required folders exist in the application directory.
-    Works for Python files and PyInstaller
-    If any folder is missing, prints an error message and exits.
+    Works for Python files and PyInstaller.
     """
-    # Determine the base folder (sys.executable if PyInstaller, directory if script)
-    base = os.path.dirname(sys.executable if hasattr(sys, "_MEIPASS") else __file__)
+    # PyInstaller base path logic
+    if hasattr(sys, "_MEIPASS"):
+        base = os.path.dirname(sys.executable)
+    else:
+        base = os.path.dirname(os.path.abspath(__file__))
 
-    # Check for missing folders
     missing = [f for f in REQUIRED_FOLDERS if not os.path.isdir(os.path.join(base, f))]
+
     if missing:
-        print(f"ERROR: Missing required folders: {missing}")
-        print("ThorCPY must be placed in a folder containing bin/, config/, logs/")
-        input("Press Enter to exit...")
+        msg = (
+            f"ThorCPY failed to start.\n\n"
+            f"Missing required folders:\n"
+            f"{', '.join(missing)}\n\n"
+            f"ThorCPY must be installed with:\n"
+            f"bin/, config/, logs/\n\n"
+            f"Please reinstall or extract the full package."
+        )
+
+        print(msg)  # Console mode
+        show_fatal_error("ThorCPY Startup Error", msg)  # EXE mode
         sys.exit(1)
+
 
 
 def setup_logging():
@@ -145,11 +168,9 @@ def main():
 
     try:
         ctypes.windll.shcore.SetProcessDpiAwareness(1)
-    except Exception:
+    except Exception as DpiAwareErr:
+        logger.error(f"Could not set DPI Awareness: {DpiAwareErr}")
         pass
-
-    # Import launcher after checks pass
-    from src.launcher import Launcher
 
     # Create the main launcher object and start it
     app = Launcher()
