@@ -113,7 +113,7 @@ def check_runtime_structure():
             f"{', '.join(missing)}\n\n"
             f"ThorCPY must be installed with:\n"
             f"bin/, config/, logs/\n\n"
-            f"Please reinstall or extract the full package."
+            f"Please reinstall or extract the full build."
         )
 
         print(msg)  # Console mode
