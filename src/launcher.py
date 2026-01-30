@@ -31,6 +31,7 @@ from src.win32_dock import Win32Dock, apply_docked_style, apply_undocked_style
 from src.presets import PresetStore
 from src.config import ConfigManager
 from src.ui_pygame import show_loading_screen
+from src.win32_darkmode import enable_dark_titlebar
 
 logger = logging.getLogger(__name__)
 
@@ -221,6 +222,9 @@ class Launcher:
                 self.hwnd_container = hwnd
                 self.dock.hwnd_container = hwnd
                 self.user32.ShowWindow(hwnd, SW_SHOW)
+
+                # Enable the dark titlebar
+                enable_dark_titlebar(hwnd)
 
             msg = wintypes.MSG()
             while self.running and self.user32.GetMessageW(
