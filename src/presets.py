@@ -22,9 +22,13 @@ import os
 import re
 import logging
 
+MAX_PRESET_NAME_LENGTH = 50
+JSON_INDENT = 4
+DEFAULT_ENCODING = "utf-8"
+INVALID_CHARS = r'[<>:"/\\|?*\x00-\x1f]'
+
 # Setup logger for this module
 logger = logging.getLogger(__name__)
-
 
 class PresetStore:
     """
@@ -48,8 +52,8 @@ class PresetStore:
             if dir_path:  # Only create if there's a directory component
                 os.makedirs(dir_path, exist_ok=True)
                 logger.debug(f"Ensured directory exists: {dir_path}")
-        except Exception as e:
-            logger.error(f"Failed to create preset directory: {e}", exc_info=True)
+        except Exception as DirectoryError:
+            logger.error(f"Failed to create preset directory: {DirectoryError}", exc_info=True)
             raise
 
         # Log if file exists
@@ -77,15 +81,14 @@ class PresetStore:
             logger.warning("Preset name validation failed: empty name")
             return False, "Preset name cannot be empty"
 
-        if len(name) > 50:
+        if len(name) > MAX_PRESET_NAME_LENGTH:
             logger.warning(
                 f"Preset name validation failed: too long ({len(name)} chars)"
             )
-            return False, "Preset name too long (max 50 characters)"
+            return False, f"Preset name too long (max {MAX_PRESET_NAME_LENGTH} characters)"
 
         # Check for invalid filesystem characters
-        invalid_chars = r'[<>:"/\\|?*\x00-\x1f]'
-        if re.search(invalid_chars, name):
+        if re.search(INVALID_CHARS, name):
             logger.warning(
                 "Preset name validation failed: contains invalid characters"
             )
@@ -135,19 +138,19 @@ class PresetStore:
 
             # Save to file
             logger.debug(f"Writing presets to {self.path}")
-            with open(self.path, "w", encoding="utf-8") as f:
-                json.dump(presets, f, indent=4)
+            with open(self.path, "w", encoding=DEFAULT_ENCODING) as file:
+                json.dump(presets, file, indent=JSON_INDENT)
 
             logger.info(f"Successfully saved preset '{name}' with data: {data}")
 
-        except PermissionError as e:
-            logger.error(f"Permission denied writing to {self.path}: {e}")
+        except PermissionError as PresetLoadingError:
+            logger.error(f"Permission denied writing to {self.path}: {PresetLoadingError}")
             raise
-        except IOError as e:
-            logger.error(f"IO error saving preset '{name}': {e}", exc_info=True)
+        except IOError as FileIOError:
+            logger.error(f"IO error saving preset '{name}': {FileIOError}", exc_info=True)
             raise
-        except Exception as e:
-            logger.error(f"Unexpected error saving preset '{name}': {e}", exc_info=True)
+        except Exception as PresetSaveError:
+            logger.error(f"Unexpected error saving preset '{name}': {PresetSaveError}", exc_info=True)
             raise
 
     def delete_preset(self, name):
@@ -170,8 +173,8 @@ class PresetStore:
                 logger.debug(f"Preset '{name}' removed from dictionary")
 
                 # Save updated presets
-                with open(self.path, "w", encoding="utf-8") as f:
-                    json.dump(presets, f, indent=4)
+                with open(self.path, "w", encoding=DEFAULT_ENCODING) as file:
+                    json.dump(presets, file, indent=JSON_INDENT)
 
                 logger.info(f"Successfully deleted preset: '{name}'")
                 return True
@@ -179,16 +182,14 @@ class PresetStore:
                 logger.warning(f"Cannot delete preset '{name}': does not exist")
                 return False
 
-        except PermissionError as e:
-            logger.error(f"Permission denied writing to {self.path}: {e}")
+        except PermissionError as PresetDeleteError:
+            logger.error(f"Permission denied writing to {self.path}: {PresetDeleteError}")
             raise
-        except IOError as e:
-            logger.error(f"IO error deleting preset '{name}': {e}", exc_info=True)
+        except IOError as FileIOError:
+            logger.error(f"IO error deleting preset '{name}': {FileIOError}", exc_info=True)
             raise
-        except Exception as e:
-            logger.error(
-                f"Unexpected error deleting preset '{name}': {e}", exc_info=True
-            )
+        except Exception as PresetDeleteError:
+            logger.error(f"Unexpected error deleting preset '{name}': {PresetDeleteError}", exc_info=True)
             raise
 
     def load_all(self):
@@ -206,30 +207,28 @@ class PresetStore:
 
         try:
             logger.debug(f"Loading presets from {self.path}")
-            with open(self.path, "r", encoding="utf-8") as f:
-                presets = json.load(f)
+            with open(self.path, "r", encoding=DEFAULT_ENCODING) as file:
+                presets = json.load(file)
 
             if not isinstance(presets, dict):
                 logger.error(f"Preset file contains invalid data type: {type(presets)}")
                 return {}
 
-            logger.debug(
-                f"Loaded {len(presets)} preset(s) from disk: {list(presets.keys())}"
-            )
+            logger.debug(f"Loaded {len(presets)} preset(s) from disk: {list(presets.keys())}")
             return presets
 
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON decode error reading {self.path}: {e}", exc_info=True)
+        except json.JSONDecodeError as JSONDecodeError:
+            logger.error(f"JSON decode error reading {self.path}: {JSONDecodeError}", exc_info=True)
             logger.warning("Returning empty preset dictionary due to corrupted file")
             return {}
-        except PermissionError as e:
-            logger.error(f"Permission denied reading {self.path}: {e}")
+        except PermissionError as ErrorLoadingPresets:
+            logger.error(f"Permission denied reading {self.path}: {ErrorLoadingPresets}")
             return {}
-        except IOError as e:
-            logger.error(f"IO error reading presets: {e}", exc_info=True)
+        except IOError as FileIOError:
+            logger.error(f"IO error reading presets: {FileIOError}", exc_info=True)
             return {}
-        except Exception as e:
-            logger.error(f"Unexpected error loading presets: {e}", exc_info=True)
+        except Exception as PresetSaveError:
+            logger.error(f"Unexpected error loading presets: {PresetSaveError}", exc_info=True)
             return {}
 
     def get_preset(self, name):

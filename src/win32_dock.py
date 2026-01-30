@@ -1,4 +1,4 @@
-# ThorCPY – Dual-screen scrcpy docking and control UI for Windows
+# ThorCPY - Dual-screen scrcpy docking and control UI for Windows
 # Copyright (C) 2026 the_swest
 # Contact: Github issues
 #
@@ -47,6 +47,9 @@ WS_SYSMENU = 0x00080000  # System menu (close button)
 WS_CLIPCHILDREN = 0x02000000  # Prevent parent from drawing over children
 WS_CLIPSIBLINGS = 0x04000000  # Prevent siblings from drawing over each other
 
+# Window combination styles
+WS_OVERLAPPEDWINDOW = 0x00CF0000  # Standard overlapped window (title bar, resize, min/max/close buttons)
+
 # SetWindowPos flags
 SWP_NOZORDER = 0x0004  # Don't change Z order
 SWP_NOACTIVATE = 0x0010  # Don't activate window
@@ -54,6 +57,12 @@ SWP_FRAMECHANGED = 0x0020  # Forces style refresh
 SWP_NOMOVE = 0x0002  # Don't move
 SWP_NOSIZE = 0x0001  # Don't resize
 SWP_NOCOPYBITS = 0x0100  # Force full redraw
+
+# Timing constants
+MIN_SYNC_INTERVAL = 0.016  # Minimum time between sync operations (60 FPS)
+THREAD_ATTACH_TIMEOUT = 0.5  # Timeout for thread attachment operations (seconds)
+DETACH_RETRY_DELAY = 0.01  # Delay between detach retry attempts (seconds)
+MAX_DETACH_ATTEMPTS = 3  # Maximum number of detach retry attempts
 
 
 # Main Dock Manager Class
@@ -69,7 +78,7 @@ class Win32Dock:
         self.hwnd_top = None
         self.hwnd_bottom = None
         self._last_sync = 0
-        self._min_sync_interval = 0.016
+        self._min_sync_interval = MIN_SYNC_INTERVAL
         logger.debug("Win32Dock initialized with null window handles")
 
     def sync(self, tx, ty, bx, by, w1, h1, w2, h2, is_docked=True):
@@ -249,9 +258,6 @@ def apply_undocked_style(hwnd):
     try:
         logger.info(f"Applying undocked style to window {hwnd}")
 
-        # Normal windows window style
-        WS_OVERLAPPEDWINDOW = 0x00CF0000
-
         # Get current style
         style = user32.GetWindowLongW(hwnd, GWL_STYLE)
         if not style:
@@ -352,7 +358,7 @@ def set_foreground_with_attach(hwnd):
 
         # If that didn't work, try with attachment
         attached = False
-        attach_timeout = time.time() + 0.5  # 500ms timeout
+        attach_timeout = time.time() + THREAD_ATTACH_TIMEOUT
 
         try:
             attached = bool(user32.AttachThreadInput(tid_cur, tid_target, True))
@@ -382,8 +388,7 @@ def set_foreground_with_attach(hwnd):
         finally:
             # CRITICAL: Always detach with multiple attempts
             if attached:
-                max_detach_attempts = 3
-                for attempt in range(max_detach_attempts):
+                for attempt in range(MAX_DETACH_ATTEMPTS):
                     try:
                         detach_result = user32.AttachThreadInput(
                             tid_cur, tid_target, False
@@ -394,10 +399,10 @@ def set_foreground_with_attach(hwnd):
                             )
                             break
                         else:
-                            time.sleep(0.01)  # Brief delay before retry
+                            time.sleep(DETACH_RETRY_DELAY)
                     except Exception as e:
                         logger.error(f"Detach attempt {attempt + 1} failed: {e}")
-                        if attempt == max_detach_attempts - 1:
+                        if attempt == MAX_DETACH_ATTEMPTS - 1:
                             logger.critical(
                                 "FAILED TO DETACH THREAD INPUT - POTENTIAL INSTABILITY"
                             )

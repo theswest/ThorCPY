@@ -1,4 +1,4 @@
-# ThorCPY – Dual-screen scrcpy docking and control UI for Windows
+# ThorCPY - Dual-screen scrcpy docking and control UI for Windows
 # Copyright (C) 2026 the_swest
 # Contact: Github issues
 #
@@ -31,24 +31,29 @@ dwmapi = ctypes.windll.dwmapi
 # Windows GUI Functions
 user32 = ctypes.windll.user32
 
-# Windows 10/11 dark mode attribute ID
-DWMWA_USE_IMMERSIVE_DARK_MODE = 20
+# Windows build version constants
+WINDOWS_BUILD_18985 = 18985
 
+# Windows 10/11 dark mode attribute IDs
+DWMWA_USE_DARK_MODE_LEGACY = 19
+DWMWA_USE_IMMERSIVE_DARK_MODE = 20
 
 def enable_dark_titlebar(hwnd):
     """
-    Enables dark mode titlebar for a specfic window
-    Works on windows 10 1809+ and Windows 11
+    Enables dark mode titlebar for a specific window
+    Works on Windows 10 1809+ and Windows 11
     Args:
         hwnd: int, Handle to the window (HWND)
     """
     try:
         version = sys.getwindowsversion().build
         logger.info(f"Build retrieved, running build {version}")
-        if version < 18985:
-            DWMWA_USE_DARK_MODE = 19
+
+        # Select appropriate dark mode attribute based on Windows version
+        if version < WINDOWS_BUILD_18985:
+            DWMWA_USE_DARK_MODE = DWMWA_USE_DARK_MODE_LEGACY
         else:
-            DWMWA_USE_DARK_MODE = 20
+            DWMWA_USE_DARK_MODE = DWMWA_USE_IMMERSIVE_DARK_MODE
 
         value = wintypes.BOOL(True)
         dwmapi.DwmSetWindowAttribute(
