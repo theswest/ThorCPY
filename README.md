@@ -10,7 +10,7 @@ It features a layout editor, window docking, screenshots, and window moving.
 It launches two scrcpy windows (one for each display), and embeds them into a native windows container.
 Designed for screensharing, recording or livestreaming.
 
-**The current build is broken on Windows 10. A solution has been found and implemented, and will be found in the next release if no more issues arise**
+**The current build is broken on Windows 10. A solution has been found and implemented, and will be included in the next release if no more issues arise**
 
 
 | Main UI                            | ThorCPY Screenshot                             |
