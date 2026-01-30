@@ -163,7 +163,7 @@ class ScrcpyManager:
 
             lines = out.strip().splitlines()[1:]  # Skip header line
             devices = [
-                l.split()[0] for l in lines if "device" in l and "unauthorized" not in l
+                line.split()[0] for line in lines if "device" in line and "unauthorized" not in line
             ]
 
             if devices:

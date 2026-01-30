@@ -54,7 +54,7 @@ class Launcher:
         # 4. FORCED LAYOUT LOGIC (Ignoring saved tx/ty/bx/by)
         # We use the scaled dimensions from ScrcpyManager (usually 1080x1920 base)
         w1, h1 = self.scrcpy.f_w1, self.scrcpy.f_h1
-        w2, h2 = self.scrcpy.f_w2, self.scrcpy.f_h2
+        w2, _ = self.scrcpy.f_w2, self.scrcpy.f_h2
 
         # Top screen is always at 0,0
         self.tx = 0
@@ -90,7 +90,8 @@ class Launcher:
                 self.LPARAM,
             ]
             self.user32.DefWindowProcW.restype = self.LRESULT
-        except:
+        except Exception as e:
+            logger.error(f"Error when defining window argtypes: {e}")
             pass
 
     def save_layout(self):

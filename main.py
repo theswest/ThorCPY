@@ -52,7 +52,7 @@ def check_windows_version():
 
                 root = tk.Tk()
                 root.withdraw()
-                result = messagebox.showwarning(
+                messagebox.showwarning(
                     "Windows 10 Detected - Known Issues",
                     f"WARNING: You are running Windows 10 (Build {build})\n\n"
                     f"ThorCPY has been reported to have stability issues on Windows 10.\n"
@@ -60,18 +60,18 @@ def check_windows_version():
                     f"Continue anyway?",
                 )
                 root.destroy()
-            except:
+            except Exception as tk_err:
                 # Fallback to console message
                 print("=" * 60)
-                print("WARNING: Windows 10 Detected - Known Issues")
+                print("WARNING: Windows 10 Detected - Unstable Build with Known Issues")
                 print("=" * 60)
                 print(f"You are running Windows 10 (Build {build})")
                 print("")
                 print("ThorCPY has known stability issues on Windows 10.")
-                print("The control panel may crash when the window loses focus.")
                 print("")
                 print("For the best experience, please upgrade to Windows 11.")
                 print("=" * 60)
+                print(f"(GUI warning failed: {tk_err})")
                 input("\nPress Enter to continue anyway...")
         else:
             print(f"✓ Windows 11 detected (Build {build})")
@@ -140,7 +140,7 @@ def main():
     logger = logging.getLogger(__name__)
     logger.info(f"Starting {__app_name__} v{__version__}")
     logger.info(
-        f"System: Windows {sys.getwindowsversion().major}.{sys.getwindowsversion().minor} Build {sys.getwindowsversion().build}"
+        f"System: Windows Build {sys.getwindowsversion().build}"
     )
 
     try:

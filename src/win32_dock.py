@@ -346,7 +346,8 @@ def set_foreground_with_attach(hwnd):
                     f"Window {hwnd} brought to foreground (no attachment needed)"
                 )
                 return
-        except:
+        except Exception as e:
+            logger.error(f"Error setting foreground window: {e}")
             pass
 
         # If that didn't work, try with attachment
