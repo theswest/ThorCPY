@@ -1,4 +1,4 @@
-# ThorCPY – Dual-screen scrcpy docking and control UI for Windows
+# ThorCPY - Dual-screen scrcpy docking and control UI for Windows
 # Copyright (C) 2026 the_swest
 # Contact: Github issues
 #
@@ -20,20 +20,19 @@
 import threading
 import time
 import ctypes
+
 import pygame
 import os
 import logging
 from ctypes import wintypes
 
-from src.scrcpy_manager import ScrcpyManager
-from src.win32_dock import Win32Dock, apply_docked_style
+from src.scrcpy_manager import ScrcpyManager, TOP_SCREEN_WINDOW_TITLE, BOTTOM_SCREEN_WINDOW_TITLE
+from src.win32_dock import Win32Dock, apply_docked_style, apply_undocked_style
 from src.presets import PresetStore
 from src.config import ConfigManager
 from src.ui_pygame import show_loading_screen
 
 logger = logging.getLogger(__name__)
-
-DEFAULT_LAYOUT = {"tx": 0, "ty": 0, "bx": 0, "by": 0, "global_scale": 0.6}
 
 # Win32 Constants
 WM_CLOSE = 0x0010
@@ -46,6 +45,28 @@ WS_EX_CONTROLPARENT = 0x00010000
 SW_HIDE = 0
 SW_SHOW = 5
 
+BLACK_BRUSH = 4
+
+CREATE_NO_WINDOW = 0x08000000
+
+TOP_SCREEN_DEFAULT_X = 0
+TOP_SCREEN_DEFAULT_Y = 0
+BOTTOM_SCREEN_DEFAULT_X = 0
+BOTTOM_SCREEN_DEFAULT_Y = 0
+DEFAULT_GLOBAL_SCALE = 0.6
+
+DEFAULT_CONTAINER_X = 100
+DEFAULT_CONTAINER_Y = 100
+
+SCRCPY_POLL_INTERVAL = 0.1
+DOCKING_MONITOR_TIME_DELAY = 0.5
+
+UI_FPS = 60
+HALF = 0.5
+
+DEFAULT_LAYOUT = {"tx": TOP_SCREEN_DEFAULT_X, "ty": TOP_SCREEN_DEFAULT_Y,
+                  "bx": BOTTOM_SCREEN_DEFAULT_X, "by": BOTTOM_SCREEN_DEFAULT_Y,
+                  "global_scale": DEFAULT_GLOBAL_SCALE}
 
 class Launcher:
     def __init__(self):
@@ -72,15 +93,15 @@ class Launcher:
         w2, _ = self.scrcpy.f_w2, self.scrcpy.f_h2
 
         # Top screen is always at 0,0
-        self.tx = 0
-        self.ty = 0
+        self.tx = TOP_SCREEN_DEFAULT_X
+        self.ty = TOP_SCREEN_DEFAULT_Y
 
         # Bottom screen Y is directly below Top screen
         self.by = int(h1)
 
         # Bottom screen X is centered relative to Top screen
         # Math: (TopWidth / 2) - (BottomWidth / 2)
-        self.bx = int((w1 / 2) - (w2 / 2))
+        self.bx = int(w1 * HALF - w2 * HALF)
 
         logger.info(
             f"Layout Reset: Top(0,0), Bottom({self.bx}, {self.by}) at Scale {self.global_scale}"
@@ -105,8 +126,8 @@ class Launcher:
                 self.LPARAM,
             ]
             self.user32.DefWindowProcW.restype = self.LRESULT
-        except Exception as e:
-            logger.error(f"Error when defining window argtypes: {e}")
+        except Exception as ArgtypeError:
+            logger.error(f"Error when defining window argtypes: {ArgtypeError}")
             pass
 
     def save_layout(self):
@@ -118,8 +139,8 @@ class Launcher:
             self.config.set("by", self.by)
             self.config.set("global_scale", self.global_scale)
             logger.info(f"Saved configuration (Scale: {self.global_scale})")
-        except Exception as e:
-            logger.error(f"Failed to save configuration: {e}")
+        except Exception as SaveConfigError:
+            logger.error(f"Failed to save configuration: {SaveConfigError}")
 
     def save_scale(self):
         """Utility for ui_pygame to trigger a scale-only save"""
@@ -141,7 +162,7 @@ class Launcher:
     def _create_container_window(self):
         def loop():
             while self.scrcpy.f_w1 == 0:
-                time.sleep(0.1)
+                time.sleep(SCRCPY_POLL_INTERVAL)
                 if not self.running:
                     return
 
@@ -167,7 +188,7 @@ class Launcher:
             wc.lpszClassName = "ThorFinalBridge"
             hinst = self.kernel32.GetModuleHandleW(None)
             wc.hInstance = hinst
-            wc.hbrBackground = ctypes.windll.gdi32.GetStockObject(4)
+            wc.hbrBackground = ctypes.windll.gdi32.GetStockObject(BLACK_BRUSH)
 
             self.user32.RegisterClassExW(ctypes.byref(wc))
 
@@ -186,8 +207,8 @@ class Launcher:
                 "ThorFinalBridge",
                 "ThorCPY",
                 style,
-                100,
-                100,
+                DEFAULT_CONTAINER_X,
+                DEFAULT_CONTAINER_Y,
                 rect.right - rect.left,
                 rect.bottom - rect.top,
                 None,
@@ -214,8 +235,8 @@ class Launcher:
         while self.running:
             with self.dock_lock:
                 if self.hwnd_container and self.docked:
-                    t = self.user32.FindWindowW(None, "TF_T")
-                    b = self.user32.FindWindowW(None, "TF_B")
+                    t = self.user32.FindWindowW(None, TOP_SCREEN_WINDOW_TITLE)
+                    b = self.user32.FindWindowW(None, BOTTOM_SCREEN_WINDOW_TITLE)
                     if t and self.user32.GetParent(t) != self.hwnd_container:
                         self.user32.SetParent(t, self.hwnd_container)
                         apply_docked_style(t)
@@ -224,7 +245,40 @@ class Launcher:
                         self.user32.SetParent(b, self.hwnd_container)
                         apply_docked_style(b)
                         self.dock.hwnd_bottom = b
-            time.sleep(0.5)
+            time.sleep(DOCKING_MONITOR_TIME_DELAY)
+
+    def toggle_dock(self):
+        """
+        Switches between docked and undocked mode
+        Updates window styles and visibility
+        """
+        if not self.dock.hwnd_top or not self.dock.hwnd_bottom:
+            logger.warning("Cannot toggle dock: windows not available")
+            return
+
+        # Use lock to prevent race condition with _docking_monitor
+        with self.dock_lock:
+            if self.docked:
+                # Undock windows
+                logger.info("Undocking windows")
+                self.docked = False  # Set flag FIRST to prevent monitor from re-docking
+
+                apply_undocked_style(self.dock.hwnd_top)
+                apply_undocked_style(self.dock.hwnd_bottom)
+                self.user32.ShowWindow(self.hwnd_container, SW_HIDE)
+
+                logger.info("Windows undocked successfully")
+            else:
+                # Dock windows
+                logger.info("Docking windows")
+                self.user32.ShowWindow(self.hwnd_container, SW_SHOW)
+                self.user32.SetParent(self.dock.hwnd_top, self.hwnd_container)
+                self.user32.SetParent(self.dock.hwnd_bottom, self.hwnd_container)
+                apply_docked_style(self.dock.hwnd_top)
+                apply_docked_style(self.dock.hwnd_bottom)
+                self.docked = True  # Set flag LAST after docking is complete
+
+                logger.info("Windows docked successfully")
 
     def launch(self):
         self.running = True
@@ -267,7 +321,7 @@ class Launcher:
                     is_docked=self.docked,
                 )
             self.ui.render()
-            clock.tick(60)
+            clock.tick(UI_FPS)
 
     def stop(self):
         if not self.running:
@@ -279,7 +333,7 @@ class Launcher:
         subprocess.run(
             ["taskkill", "/F", "/IM", "scrcpy.exe", "/T"],
             capture_output=True,
-            creationflags=0x08000000,
+            creationflags=CREATE_NO_WINDOW,
         )
         pygame.quit()
         if self.hwnd_container:
