@@ -21,13 +21,13 @@ import json
 import os
 import logging
 
-JSON_INDENT = 4
-DEFAULT_ENCODING = "utf-8"
+JSON_INDENT = 4 # Indent size of the JSON file
+DEFAULT_ENCODING = "utf-8" # Default encoding used
 
 logger = logging.getLogger(__name__)
 
 class ConfigManager:
-    """Manages global configuration settings"""
+    """Manages configuration settings"""
 
     def __init__(self, path):
         self.path = path
@@ -43,11 +43,13 @@ class ConfigManager:
             raise
 
     def load(self):
-        """Load config from disk"""
+        """Load config file"""
+        # Check to see if file exists
         if not os.path.exists(self.path):
             logger.debug(f"Config file does not exist: {self.path}, returning defaults")
             return {}
 
+        # Try to open the file
         try:
             with open(self.path, "r", encoding="utf-8") as file:
                 config = json.load(file)
@@ -71,11 +73,13 @@ class ConfigManager:
             logger.error(f"Failed to save config: {SaveConfigError}", exc_info=True)
             raise
 
+    # Get a value
     def get(self, key, default=None):
         """Get a config value"""
         config = self.load()
         return config.get(key, default)
 
+    # Set a value
     def set(self, key, value):
         """Set a config value"""
         config = self.load()
