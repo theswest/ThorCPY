@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # src/scrcpy_manager.py
+
 import os
 import subprocess
 import time
