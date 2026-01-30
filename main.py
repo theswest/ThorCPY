@@ -58,6 +58,7 @@ def check_windows_version():
                     "Windows 10 Detected - Known Issues",
                     f"WARNING: You are running Windows 10 (Build {build})\n\n"
                     f"ThorCPY has been reported to have stability issues on Windows 10.\n"
+                    f"Restarting ThorCPY can sometimes fix small issues.\n"
                     f"For the best experience, please upgrade to Windows 11.\n\n"
                     f"Continue anyway?",
                 )
