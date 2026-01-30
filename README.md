@@ -108,6 +108,7 @@ Control Panel:
 	- Undock windows: Separate windows into independent floating windows (for individual window capture e.g. streaming layout)
 	 - Dock windows: Bring undocked windows back into one, unified window
 	 - Screenshot: Capture the entire docked view to clipboard (only works when docked)
+       - Note: Screenshot background transparency is only available on Windows 11  
 - Preset Management:
 	- Adjust your layout as desired
 	 - Enter a name into the preset field
