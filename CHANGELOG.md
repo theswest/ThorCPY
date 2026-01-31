@@ -1,16 +1,25 @@
 # Changelog
 
-## 0.1.1 - 2026-01-26
+## 0.2.0 - 31-01-2026
+### Added
+- Added ability to change Scrcpy Scale
+- Better logging and error handling
 ### Bugfixes
-- Added incompatibility warning for Windows 10 
-- Fixed spacing on "DOCK WINDOWS" text 
-- Debounce and throttle sync() calls 
-- Add thread safety to window focus handling 
+- Fixed issue with Control Panel crashing on Windows 10 and improved Windows 10 Compatibility
+- Updated codebase to become more refined
+
+
+## 0.1.1 - 28-01-2026
+### Added
+- Added incompatibility warning for Windows 10
+- Add thread safety to window focus handling
 - Improved dark mode support
+### Bugfixes
+- Fixed spacing on "DOCK WINDOWS" text 
+- Debounce and throttle sync() calls
 
 
-
-## 0.1.0 - 2026-01-26
+## 0.1.0 - 26-01-2026
 ### Added
 - Dual-screen scrcpy docking
 - Layout presets
