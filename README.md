@@ -82,22 +82,21 @@ To manually create the `bin` folder, simply extract the [latest release of scrcp
 
 ## Requirements:
 
-System:
+### System:
 - OS: Windows 11 (Theoretically also Windows 10 (1809+))
 - Python 3.8 or higher when running from source
 - **Device**: AYN Thor with USB debugging enabled
 
-Included Dependencies:
+### Included Dependencies:
 - ADB (Android Debug Bridge) - in `bin/` folder
 - scrcpy binary - in `bin/` folder
 
-Python Dependencies:
+### Python Dependencies:
 -  See [requirements.txt](https://github.com/theswest/ThorCPY/blob/master/requirements.txt) for the full list. Install with:
 	- `pip install -r requirements.txt`
 
 ## Usage:
 
-Control Panel:
 - The ThorCPY control panel appears on the right hand side of your screen with the following controls:
 - Global Scale:
     - Adjust the scale of the scrcpy outputs (requires restart)
@@ -121,7 +120,7 @@ Control Panel:
 
 ## Configuration:
 
-Layouts/Presets:
+### Layouts/Presets:
 - Presets are stored in config/layout.json
 - You can manually edit this file if needed:
 ```json title:layout.json
@@ -143,7 +142,7 @@ Layouts/Presets:
 }
 ```
 
-Config:
+### Config:
 - More general config settings are saved in config/config.json
 - You can manually edit this file if needed:
 ```json title:config.json
@@ -156,12 +155,12 @@ Config:
 }
 ```
 
-Scaling:
+### Scaling:
 - The default scaling is set to 0.6 (60% of original resolution).
 - An easier way to change this will be added in the future, for now you can modify `global_scale` in `launcher.py`.
 - `self.global_scale = 0.6  # Change to desired scale (0.3 to 1.0 recommended)`
 
-Logging:
+### Logging:
 - Logs are automatically saved to logs/, with daily rotation. Log files are named:
 	 - `thorcpy_YYYYMMDD.log` - Main application log
 	 - `thorcpy_top_YYYYMMDD_HHMMSS.log` - Top window scrcpy output
@@ -176,34 +175,38 @@ logging.basicConfig(
 
 ## Troubleshooting:
 
-Device Not Found:
+### Layout issues:
+- Load the preset at 0.6 global scale and save it.
+- Delete `config/layout.json` and `config/config.json` so they are reloaded
+
+### Device Not Found:
 - Ensure USB debugging is enabled on your Thor - Try a different USB cable (Ensure data cable, not charging-only)
 - Revoke USB debugging authorizations and reconnect:
 	- Settings -> System -> Developer Options -> Revoke USB debugging authorizations
 - Check if ADB can see your device: `bin/adb.exe devices`
 - Restart ADB server: `bin/adb.exe kill-server` then `bin/adb.exe start-server`
 
-Scrcpy won't start:
+### Scrcpy won't start:
 - Ensure that scrcpy.exe is in the bin/ folder
 - Check logs for detailed error messages
 - Try running scrcpy manually: `bin/scrcpy.exe -s YOUR_DEVICE_SERIAL`
 - Update to the latest scrcpy version
 - Ensure your device has the required display IDs (0 and 4)
 
-Windows Won't Dock:    
+### Windows Won't Dock:    
  - Wait a few seconds for windows to initialize
  - Try toggling dock/undock multiple times
  - Restart the application
  - Check logs for any errors
 
-Performance Issues:    
+### Performance Issues:    
  - Reduce the global scale
  - Close other resource-intensive applications
  - Use a USB 3 port
  - Lower the max FPS in launcher.py (change --max-fps)
  - Reduce the video bitrate in scrcpy_manager.py
 
-Missing DLL or Import Errors
+### Missing DLL or Import Errors
  - Reinstall dependencies: `pip install -r requirements.txt --force-reinstall`
  - Ensure Python 3.8+ is installed
  - Install Visual C++ Redistributables
