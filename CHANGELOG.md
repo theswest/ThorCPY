@@ -7,6 +7,7 @@
 ### Bugfixes
 - Fixed issue with Control Panel crashing on Windows 10 and improved Windows 10 Compatibility
 - Updated codebase to become more refined
+- Improved window management safeguards for Windows 10
 
 
 ## 0.1.1 - 28-01-2026
