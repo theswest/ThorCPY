@@ -73,6 +73,9 @@ class Win32Dock:
     """
 
     def __init__(self):
+        """
+        Initialize the window manager.
+        """
         logger.info("Initializing Win32Dock")
         self.hwnd_container = None
         self.hwnd_top = None
@@ -111,7 +114,7 @@ class Win32Dock:
             flags = SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS
 
             if is_docked:
-                # Child windows are drawn relative to container client area
+                # Child windows are drawn relative to the container
                 logger.debug(
                     f"Syncing docked windows - Top: ({tx}, {ty}, {w1}x{h1}), Bottom: ({bx}, {by}, {w2}x{h2})"
                 )
@@ -150,7 +153,8 @@ class Win32Dock:
                     screen_by = rect.top + int(by)
 
                     logger.debug(
-                        f"Syncing undocked windows - Top: ({screen_tx}, {screen_ty}), Bottom: ({screen_bx}, {screen_by})"
+                        f"Syncing undocked windows - Top: ({screen_tx}, {screen_ty}), "
+                        f"Bottom: ({screen_bx}, {screen_by})"
                     )
 
                     user32.SetWindowPos(
@@ -168,8 +172,8 @@ class Win32Dock:
                 else:
                     logger.warning("Cannot sync undocked windows: no container handle")
 
-        except Exception as e:
-            logger.error(f"Error during window sync: {e}", exc_info=True)
+        except Exception as WindowSyncError:
+            logger.error(f"Error during window sync: {WindowSyncError}", exc_info=True)
 
 
 # Window Style Transformers
@@ -227,21 +231,15 @@ def apply_docked_style(hwnd):
     try:
         logger.debug(f"Forcing frame change for hwnd {hwnd}")
         result = user32.SetWindowPos(
-            hwnd,
-            0,
-            0,
-            0,
-            0,
-            0,
-            SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE,
-        )
+            hwnd, 0, 0, 0, 0, 0,
+            SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE)
         if not result:
             logger.warning(f"SetWindowPos frame change may have failed for hwnd {hwnd}")
         else:
             logger.debug(f"Docked style applied successfully to hwnd {hwnd}")
 
-    except Exception as e:
-        logger.error(f"Error forcing frame change for hwnd {hwnd}: {e}", exc_info=True)
+    except Exception as FrameForceError:
+        logger.error(f"Error forcing frame change for hwnd {hwnd}: {FrameForceError}", exc_info=True)
 
 
 def apply_undocked_style(hwnd):
@@ -290,23 +288,15 @@ def apply_undocked_style(hwnd):
         # Force windows to redraw borders/title bar
         logger.debug(f"Forcing frame change for hwnd {hwnd}")
         result = user32.SetWindowPos(
-            hwnd,
-            0,
-            0,
-            0,
-            0,
-            0,
-            SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE,
-        )
+            hwnd, 0, 0, 0, 0, 0,
+            SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE)
         if not result:
             logger.warning(f"SetWindowPos frame change may have failed for hwnd {hwnd}")
         else:
             logger.info(f"Undocked style applied successfully to hwnd {hwnd}")
 
-    except Exception as e:
-        logger.error(
-            f"Error applying undocked style to hwnd {hwnd}: {e}", exc_info=True
-        )
+    except Exception as UndockedStylingError:
+        logger.error(f"Error applying undocked style to hwnd {hwnd}: {UndockedStylingError}", exc_info=True)
 
 
 # Focus / Input Manager
@@ -319,6 +309,7 @@ def set_foreground_with_attach(hwnd):
         logger.warning(f"set_foreground_with_attach called with invalid hwnd: {hwnd}")
         return
 
+    # Attempt to set the foreground window
     try:
         logger.debug(f"Attempting to set foreground window: {hwnd}")
 
@@ -333,10 +324,9 @@ def set_foreground_with_attach(hwnd):
             try:
                 user32.SetForegroundWindow(hwnd)
                 logger.info(f"Window {hwnd} brought to foreground (same thread)")
-            except Exception as e:
-                logger.error(
-                    f"Error setting foreground window (same thread): {e}", exc_info=True
-                )
+            except Exception as ForegroundWindowError:
+                logger.error(f"Error setting foreground window (same thread): {ForegroundWindowError}",
+                             exc_info=True)
             return
 
         # Validate target thread
@@ -352,8 +342,8 @@ def set_foreground_with_attach(hwnd):
                     f"Window {hwnd} brought to foreground (no attachment needed)"
                 )
                 return
-        except Exception as e:
-            logger.error(f"Error setting foreground window: {e}")
+        except Exception as ForegroundWindowError:
+            logger.error(f"Error setting foreground window: {ForegroundWindowError}")
             pass
 
         # If that didn't work, try with attachment
@@ -368,25 +358,22 @@ def set_foreground_with_attach(hwnd):
 
             logger.debug("Thread input queues attached successfully")
 
-            # Quick focus operation with timeout check
+            # Quick focus with timeout check
             if time.time() < attach_timeout:
                 try:
                     user32.SetForegroundWindow(hwnd)
                     user32.SetActiveWindow(hwnd)
                     user32.SetFocus(hwnd)
-                    logger.info(
-                        f"Window {hwnd} brought to foreground (with attachment)"
-                    )
-                except Exception as e:
-                    logger.error(
-                        f"Error setting foreground window {hwnd}: {e}", exc_info=True
-                    )
+                    logger.info(f"Window {hwnd} brought to foreground (with attachment)")
+                except Exception as ForegroundWindowSetError:
+                    logger.error(f"Error setting foreground window {hwnd}: {ForegroundWindowSetError}",
+                                 exc_info=True)
 
-        except Exception as e:
-            logger.warning(f"Error during thread attachment: {e}")
+        except Exception as ThreadAttachmentError:
+            logger.warning(f"Error during thread attachment: {ThreadAttachmentError}")
 
         finally:
-            # CRITICAL: Always detach with multiple attempts
+            # Always detach with multiple attempts
             if attached:
                 for attempt in range(MAX_DETACH_ATTEMPTS):
                     try:
@@ -394,20 +381,15 @@ def set_foreground_with_attach(hwnd):
                             tid_cur, tid_target, False
                         )
                         if detach_result:
-                            logger.debug(
-                                f"Thread input queues detached (attempt {attempt + 1})"
-                            )
+                            logger.debug(f"Thread input queues detached (attempt {attempt + 1})")
                             break
                         else:
                             time.sleep(DETACH_RETRY_DELAY)
-                    except Exception as e:
-                        logger.error(f"Detach attempt {attempt + 1} failed: {e}")
+                    except Exception as DetatchmentError:
+                        logger.error(f"Detach attempt {attempt + 1} failed: {DetatchmentError}")
                         if attempt == MAX_DETACH_ATTEMPTS - 1:
-                            logger.critical(
-                                "FAILED TO DETACH THREAD INPUT - POTENTIAL INSTABILITY"
-                            )
+                            logger.critical("Failed to detatch thread input - potential instability")
 
-    except Exception as e:
-        logger.error(
-            f"Critical error in set_foreground_with_attach: {e}", exc_info=True
-        )
+    except Exception as ForegroundAttachCriticalError:
+        logger.error(f"Critical error in set_foreground_with_attach: {ForegroundAttachCriticalError}",
+                     exc_info=True)

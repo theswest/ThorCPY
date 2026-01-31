@@ -22,23 +22,28 @@ import os
 import re
 import logging
 
+# Validation Constants
 MAX_PRESET_NAME_LENGTH = 50
-JSON_INDENT = 4
-DEFAULT_ENCODING = "utf-8"
 INVALID_CHARS = r'[<>:"/\\|?*\x00-\x1f]'
 
-# Setup logger for this module
+# JSON formatting constants
+JSON_INDENT = 4
+DEFAULT_ENCODING = "utf-8"
+
+
 logger = logging.getLogger(__name__)
 
 class PresetStore:
     """
-    Manages saving, loading, and deleting layout presets.
-    Stores preset data as JSON on disk.
+    Manages persistence for layouts.
+
+    Validates saving, loading and deletion of the user-defined window layouts
+    Name validation and handles corrupted files.
     """
 
     def __init__(self, path):
         """
-        Initialize the preset store.
+        Initialize storing the preset
 
         Args:
             path: Path to the JSON file for storing presets
@@ -46,10 +51,10 @@ class PresetStore:
         logger.info(f"Initializing PresetStore with path: {path}")
         self.path = path
 
-        # Ensure directory exists
+        # Create directory structure if necessary
         try:
             dir_path = os.path.dirname(self.path)
-            if dir_path:  # Only create if there's a directory component
+            if dir_path:
                 os.makedirs(dir_path, exist_ok=True)
                 logger.debug(f"Ensured directory exists: {dir_path}")
         except Exception as DirectoryError:
@@ -67,7 +72,9 @@ class PresetStore:
     @staticmethod
     def validate_preset_name(name):
         """
-        Validate preset name for filesystem safety.
+        Validate preset name.
+
+        Checks for: Empty or whitespace names, length exceeding max length, windows-forbidden characters
 
         Args:
             name: The preset name to validate
@@ -94,7 +101,7 @@ class PresetStore:
             )
             return False, "Preset name contains invalid characters"
 
-        # Prevent directory traversal
+        # Prevent directory traversal attempts
         if ".." in name or name.startswith("."):
             logger.warning(
                 "Preset name validation failed: invalid format (directory traversal attempt?)"
@@ -114,6 +121,8 @@ class PresetStore:
 
         Raises:
             ValueError: If preset name is invalid
+            PermissionError: If file cannot be written to due to permissions
+            IOError: If file I/O fails
         """
         logger.info(f"Attempting to save preset: '{name}'")
 
@@ -162,6 +171,10 @@ class PresetStore:
 
         Returns:
             bool: True if preset was deleted, False if it didn't exist
+
+        Raises:
+            PermissionError: If file cannot be written
+            IOError: If file I/O fail
         """
         logger.info(f"Attempting to delete preset: '{name}'")
 
@@ -196,6 +209,8 @@ class PresetStore:
         """
         Load all presets from disk.
 
+        Handles missing files and corrupted JSON with an empty dict. Validates dictionary
+
         Returns:
             dict: Dictionary of all presets, or empty dict if file doesn't exist or is invalid
         """
@@ -210,6 +225,7 @@ class PresetStore:
             with open(self.path, "r", encoding=DEFAULT_ENCODING) as file:
                 presets = json.load(file)
 
+            # Validate structure
             if not isinstance(presets, dict):
                 logger.error(f"Preset file contains invalid data type: {type(presets)}")
                 return {}
@@ -239,7 +255,7 @@ class PresetStore:
             name: Name of the preset to retrieve
 
         Returns:
-            dict or None: Preset data if found, None otherwise
+            dict or None: Preset data if found, otherwise None
         """
         logger.debug(f"Retrieving preset: '{name}'")
         presets = self.load_all()

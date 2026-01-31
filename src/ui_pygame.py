@@ -29,8 +29,10 @@ from src.win32_darkmode import enable_dark_titlebar
 # Setup logger for this module
 logger = logging.getLogger(__name__)
 
+# Colour Conversion Fallback
 DEFAULT_HEX_COLOUR = (255,255,255)
 
+# Loading screen configuration
 LOADING_SCREEN_WIDTH = 400
 LOADING_SCREEN_HEIGHT = 200
 LOADING_SCREEN_FONT_SIZE = 36
@@ -39,14 +41,17 @@ LOADING_SCREEN_COLOR = (18, 20, 24)
 LOADING_SCREEN_X = 60
 LOADING_SCREEN_Y = 80
 
+# Control panel window configuration
 CONTROL_PANEL_OFFSET_X = 460
 CONTROL_PANEL_WIDTH = 450
 CONTROL_PANEL_HEIGHT = 900
 
+# Font sizes
 LARGE_FONT_SIZE = 24
 MEDIUM_FONT_SIZE = 16
 SMALL_FONT_SIZE = 14
 
+# Colour palette hex values
 BG_HEX = "#121418"
 PANEL_HEX = "#1e2128"
 BORDER_HEX = "#2d3139"
@@ -58,13 +63,16 @@ SUCCESS_HEX = "#2ecc71"
 DANGER_HEX = "#e74c3c"
 WARNING_HEX = "#f39c12"
 
+# Status message config
 INITIAL_STATUS_MESSAGE_TIME = 0
 STATUS_MESSAGE_DURATION = 2.0
 DEFAULT_STATUS_MESSAGE_TYPE = "info"
 
+# Preset config
 DEFAULT_PRESET_NAME = "NewPreset"
 PRESET_CACHE_TIME = 0.5
 
+# Slider dimensions and positioning
 SLIDER_LABEL_X = 40
 SLIDER_RECT_LEFT = 350
 SLIDER_RECT_WIDTH = 60
@@ -83,11 +91,14 @@ SLIDER_HANDLE_OFFSET_Y = 6
 SLIDER_HANDLE_WIDTH = 16
 SLIDER_HANDLE_HEIGHT = 16
 
+# Slider value constraints
 SLIDER_DRAG_MINIMUM = 0.0
 SLIDER_DRAG_MAXIMUM = 1.0
 
+# Scale change detection threshold
 SCALE_CHANGE_MIN_DETECTION = 0.01
 
+# UI layout positions
 TITLE_MARGIN_X = 20
 TITLE_MARGIN_Y = 20
 TITLE_SEPARATOR_Y = 60
@@ -97,6 +108,7 @@ TITLE_SEPARATOR_RIGHT = 430
 LAYOUT_HEADER_X = 20
 LAYOUT_HEADER_Y = 80
 
+# Global scale slider config
 SLIDER_SCALE_Y = 120
 GLOBAL_SCALE_MIN = 0.3
 GLOBAL_SCALE_MAX = 1.0
@@ -104,6 +116,7 @@ GLOBAL_SCALE_MAX = 1.0
 RESTART_NOTIF_X = 40
 RESTART_NOTIF_Y = 165
 
+# Slider positions
 SCREEN_MIN_POS = -500
 SCREEN_MAX_POS = 1500
 SLIDER_TOP_X_Y = 190
@@ -111,11 +124,13 @@ SLIDER_TOP_Y_Y = 250
 SLIDER_BOTTOM_X_Y = 310
 SLIDER_BOTTOM_Y_Y = 370
 
+# Dock/Undock button
 UNDOCK_BUTTON_X = 40
 UNDOCK_BUTTON_Y = 420
 UNDOCK_BUTTON_WIDTH = 180
 UNDOCK_BUTTON_HEIGHT = 40
 
+# Screenshot button
 SCREENSHOT_BUTTON_X = 230
 SCREENSHOT_BUTTON_Y = 420
 SCREENSHOT_BUTTON_WIDTH = 180
@@ -124,6 +139,7 @@ SCREENSHOT_BUTTON_HEIGHT = 40
 STATUS_TEXT_X = 225
 STATUS_TEXT_Y = 467
 
+# Preset section layout
 PRESET_DIVIDER_Y = 485
 PRESET_DIVIDER_LEFT = 20
 PRESET_DIVIDER_RIGHT = 430
@@ -144,15 +160,18 @@ PRESET_SAVE_BUTTON_WIDTH = 110
 
 PRESET_BORDER_RADIUS = 5
 
+# Win32 SetWindowPos flags
 SWP_NOZORDER = 0x0004
 SWP_NOACTIVATE = 0x0010
 SWP_FRAMECHANGED = 0x0020
 SWP_NOMOVE = 0x0002
 SWP_NOSIZE = 0x0001
 
+# Text colors for buttons
 WHITE_TEXT = (255, 255, 255)
 BLACK_TEXT = (0, 0, 0)
 
+# Preset list layout
 PRESET_LIST_HEADER_X = 20
 PRESET_LIST_HEADER_Y = 600
 PRESET_LIST_Y_OFFSET = 635
@@ -171,17 +190,22 @@ BUTTON_BORDER_RADIUS = 4
 
 PRESET_ROW_SPACING = 45
 
+# Error message durations
 ERROR_STATUS_DURATION = 3.0
 SLIDER_ERROR_STATUS_DURATION = 1.5
 
+# Windows clipboard and GDI constants
 CF_BITMAP = 2  # Clipboard format for bitmap images
 SRCCOPY = 0x00CC0020  # BitBlt copy mode (straight pixel copy)
 SW_SHOW = 5
 
-# Returns the absolute path for PyInstaller or python run
+
 def resource_path(rel):
     """
-    Get absolute path to resource, works for dev and for PyInstaller
+    Get absolute path to resource, works for python files and for PyInstaller
+
+    PyInstaller bundles resources to a temporary folder (_MEIPASS).
+    In development, resources are relative to the script location
 
     Args:
         rel: Relative path to resource
@@ -201,14 +225,17 @@ def resource_path(rel):
         logger.error(f"Failed to resolve resource path for '{rel}': {PathResolutionError}")
         return rel
 
-# Font path
+# Assets path
 FONT_PATH = resource_path("assets/fonts/CalSans-Regular.ttf")
 ICON_PATH = resource_path("assets/icon.png")
 
-# Hex to RGB conversion to allow hex code usage
+
 def hex_to_rgb(hex_color):
     """
     Convert hex color to RGB tuple
+
+    Supports multiple formats:
+    "#FF0000", "FF0000". "0xFF0000"
 
     Args:
         hex_color: Hex string (e.g., "#FF0000" or "FF0000") or int (0xFF0000)
@@ -243,7 +270,7 @@ def show_loading_screen():
         logger.error(f"Failed to initialize pygame for loading screen: {PygameInitError}")
         return
 
-    # Load an icon
+    # Set window icon
     try:
         icon_surface = pygame.image.load(ICON_PATH)
         pygame.display.set_icon(icon_surface)
@@ -270,7 +297,7 @@ def show_loading_screen():
     except Exception as DarkTitlebarEnableError:
         logger.warning(f"Failed to enable dark titlebar for loading screen: {DarkTitlebarEnableError}")
 
-    # Setup font and clock
+    # Setup font
     try:
         font = pygame.font.Font(FONT_PATH, LOADING_SCREEN_FONT_SIZE)
         logger.debug("Loading screen font loaded")
@@ -278,8 +305,8 @@ def show_loading_screen():
         logger.warning(f"Failed to load custom font, using default: {LoadingFontError}")
         font = pygame.font.SysFont("Arial", LOADING_SCREEN_FONT_SIZE)
 
+    # Animation loop
     clock = pygame.time.Clock()
-
     logger.debug(f"Starting loading screen animation ({LOADING_ANIMATION_FRAME_COUNT} frames)")
     for frame in range(LOADING_ANIMATION_FRAME_COUNT):
         try:
@@ -292,7 +319,7 @@ def show_loading_screen():
             logger.error(f"Error during loading screen render at frame {frame}: {LoadingScreenRenderError}")
             break
 
-    # Close window
+    # Cleanup
     try:
         pygame.display.quit()
         logger.info("Loading screen closed")
@@ -308,6 +335,12 @@ class PygameUI:
     """
 
     def __init__(self, launcher):
+        """
+        Initialize the control panel UI.
+
+        Args:
+            launcher: Reference to main Launcher instance for state access
+        """
         logger.info("Initializing PygameUI")
 
         # Reference to the main launcher and controller object
@@ -320,7 +353,7 @@ class PygameUI:
             logger.error(f"Failed to initialize pygame: {PygameInitError}")
             raise
 
-        # Load Icon
+        # Set window icon
         try:
             icon_surface = pygame.image.load(ICON_PATH)
             pygame.display.set_icon(icon_surface)
@@ -339,7 +372,7 @@ class PygameUI:
         except Exception as ControlWindowPositionError:
             logger.warning(f"Failed to position UI window: {ControlWindowPositionError}")
 
-        # Create UI window
+        # Create window
         try:
             self.screen = pygame.display.set_mode((CONTROL_PANEL_WIDTH, CONTROL_PANEL_HEIGHT))
             pygame.display.set_caption("ThorCPY Control Panel")
@@ -370,7 +403,7 @@ class PygameUI:
             self.font_md = pygame.font.SysFont("Arial", MEDIUM_FONT_SIZE)
             self.font_sm = pygame.font.SysFont("Arial", SMALL_FONT_SIZE)
 
-        # Color Palette
+        # Colors
         self.colors = {
             "bg": hex_to_rgb(BG_HEX),
             "panel": hex_to_rgb(PANEL_HEX),
@@ -403,7 +436,7 @@ class PygameUI:
         self.active_slider_input = None
         self.input_buffer = ""
 
-        # Cached presets (only reload when invalidated)
+        # Cached presets
         self._preset_cache = None
         self._preset_cache_time = 0
 
@@ -414,15 +447,20 @@ class PygameUI:
         logger.info("PygameUI initialization complete")
 
     def invalidate_preset_cache(self):
-        """Invalidate the preset cache to force reload on next access"""
+        """Force preset list to reload on the next access"""
         self._preset_cache = None
         logger.debug("Preset cache invalidated")
 
     def get_presets(self):
-        """Get presets with caching to avoid repeated file I/O"""
+        """
+        Get preset list with caching to reduce file I/O.
+        Cache is invalidated after PRESET_CACHE_TIME seconds or manually via invalidate_preset_cache().
+
+        Returns:
+            dict: Preset name -> preset data mapping
+        """
         current_time = time.time()
 
-        # Cache for some time or until invalidated
         if self._preset_cache is None or (current_time - self._preset_cache_time) > PRESET_CACHE_TIME:
             self._preset_cache = self.l.store.load_all()
             self._preset_cache_time = current_time
@@ -432,9 +470,10 @@ class PygameUI:
 
         return self._preset_cache
 
-    def show_status(self, msg, status_type=DEFAULT_STATUS_MESSAGE_TYPE, duration=STATUS_MESSAGE_DURATION):
+    def show_status(self, msg, status_type=DEFAULT_STATUS_MESSAGE_TYPE,
+                    duration=STATUS_MESSAGE_DURATION):
         """
-        Display a status message
+        Display a status message at the bottom of the UI
 
         Args:
             msg: Message to display
@@ -450,6 +489,9 @@ class PygameUI:
     def take_screenshot(self):
         """
         Takes a screenshot of both windows and copies it to the clipboard
+
+        Uses windows GDI to get the container window's client area
+        Only works when windows are docked
         """
         logger.info("Taking screenshot of docked windows")
         user32 = windll.user32
@@ -474,7 +516,7 @@ class PygameUI:
             h = rect.bottom - rect.top
             logger.debug(f"Container dimensions: {w}x{h}")
 
-            # Get Device Context (DC) handles
+            # Get Device Contexts
             hwnd_dc = user32.GetDC(self.l.hwnd_container)
             if not hwnd_dc:
                 logger.error("Failed to get container DC")
@@ -496,17 +538,15 @@ class PygameUI:
                 self.show_status("Screenshot failed", "error")
                 return
 
-            # Select bitmap into memory DC
+            # Copy pixels to bitmap
             old_bitmap = gdi32.SelectObject(mem_dc, bitmap)
-
-            # Copy pixels from window to bitmap
             success = gdi32.BitBlt(mem_dc, 0, 0, w, h, hwnd_dc, 0, 0, SRCCOPY)
 
             if not success:
                 logger.error("BitBlt failed during screenshot")
                 self.show_status("Screenshot failed", "error")
             else:
-                # Copy to clipboard
+                # Copy the bitmap to clipboard
                 user32.OpenClipboard(0)
                 user32.EmptyClipboard()
                 user32.SetClipboardData(CF_BITMAP, bitmap)
@@ -514,7 +554,7 @@ class PygameUI:
                 logger.info("Screenshot copied to clipboard successfully")
                 self.show_status("Screenshot copied to clipboard", "success")
 
-            # Cleanup
+            # Cleanup GDI objects
             gdi32.SelectObject(mem_dc, old_bitmap)
             gdi32.DeleteObject(bitmap)
             gdi32.DeleteDC(mem_dc)
@@ -541,10 +581,11 @@ class PygameUI:
             mx, my = pygame.mouse.get_pos()
             m_click = pygame.mouse.get_pressed()[0]
 
-            # Label
-            self.screen.blit(self.font_md.render(label, True, self.colors["text"]), (SLIDER_LABEL_X, y_pos))
+            # Draw label
+            self.screen.blit(self.font_md.render(label, True, self.colors["text"]),
+                             (SLIDER_LABEL_X, y_pos))
 
-            # Value Box (right-aligned, clickable for keyboard input)
+            # Value display box
             val_box = pygame.Rect(SLIDER_RECT_LEFT, y_pos, SLIDER_RECT_WIDTH, SLIDER_RECT_HEIGHT)
             box_hover = val_box.collidepoint(mx, my)
             box_active = self.active_slider_input == attr_name
@@ -556,7 +597,7 @@ class PygameUI:
             )
             pygame.draw.rect(self.screen, box_color, val_box, border_radius=SLIDER_BORDER_RADIUS)
 
-            # Format value based on slider type
+            # Format value text
             if box_active:
                 val_text = self.input_buffer
             elif attr_name == "global_scale":
@@ -568,7 +609,7 @@ class PygameUI:
             val_rect = val_render.get_rect(center=val_box.center)
             self.screen.blit(val_render, val_rect)
 
-            # Activate input box on click
+            # Activate keyboard input on click
             if m_click and box_hover and not self.m_locked:
                 if not box_active:
                     self.active_slider_input = attr_name
@@ -580,19 +621,22 @@ class PygameUI:
                     logger.debug(f"Activated slider input for {attr_name}")
                 self.m_locked = True
 
-            # Slider Track
+            # Draw slider Track
             track_y = y_pos + SLIDER_TRACK_OFFSET_Y
-            track_rect = pygame.Rect(SLIDER_TRACK_RECT_LEFT, track_y, SLIDER_TRACK_RECT_WIDTH, SLIDER_TRACK_RECT_HEIGHT)
+            track_rect = pygame.Rect(SLIDER_TRACK_RECT_LEFT, track_y, SLIDER_TRACK_RECT_WIDTH,
+                                     SLIDER_TRACK_RECT_HEIGHT)
             pygame.draw.rect(
                 self.screen, self.colors["border"], track_rect, border_radius=SLIDER_TRACK_BORDER_RADIUS
             )
 
-            # Slider Handle
+            # Calculate handle position
             norm_val = ((val - min_val) / (max_val - min_val) if max_val != min_val else SLIDER_HANDLE_FALLBACK_VALUE)
             handle_x = SLIDER_LABEL_X + int(norm_val * SLIDER_TRACK_RECT_WIDTH)
-            handle_rect = pygame.Rect(handle_x - SLIDER_HANDLE_OFFSET_X, track_y - SLIDER_HANDLE_OFFSET_Y, SLIDER_HANDLE_WIDTH, SLIDER_HANDLE_HEIGHT)
+            handle_rect = pygame.Rect(handle_x - SLIDER_HANDLE_OFFSET_X, track_y - SLIDER_HANDLE_OFFSET_Y,
+                                      SLIDER_HANDLE_WIDTH, SLIDER_HANDLE_HEIGHT)
             handle_hover = handle_rect.collidepoint(mx, my)
 
+            # Handle with hover feedback
             handle_color = (
                 self.colors["text"]
                 if handle_hover or self.dragging == attr_name
@@ -600,23 +644,26 @@ class PygameUI:
             )
             pygame.draw.circle(self.screen, handle_color, (handle_x, track_y + 2), 8)
 
-            # Drag interaction
+            # Start drag on click
             if m_click and handle_hover and not self.m_locked and not self.dragging:
                 self.dragging = attr_name
                 logger.debug(f"Started dragging slider: {attr_name}")
 
+            # Update value whilst dragging
             if self.dragging == attr_name and m_click:
-                new_norm = max(SLIDER_DRAG_MINIMUM, min(SLIDER_DRAG_MAXIMUM, (mx - SLIDER_TRACK_RECT_LEFT) / SLIDER_TRACK_RECT_WIDTH))
+                new_norm = max(SLIDER_DRAG_MINIMUM, min(SLIDER_DRAG_MAXIMUM,
+                                                        (mx - SLIDER_TRACK_RECT_LEFT) / SLIDER_TRACK_RECT_WIDTH))
                 new_val = min_val + new_norm * (max_val - min_val)
                 setattr(self.l, attr_name, new_val)
 
-                # Track if global_scale changed
+                # Check to see if global scale has changed
                 if (
                     attr_name == "global_scale"
                     and abs(new_val - self._original_scale) > SCALE_CHANGE_MIN_DETECTION
                 ):
                     self._scale_changed = True
 
+            # Save on drag release
             if not m_click and self.dragging == attr_name:
                 logger.debug(f"Stopped dragging slider: {attr_name}")
                 # Save scale separately when scale slider released
@@ -632,6 +679,7 @@ class PygameUI:
     def render(self):
         """
         Main render loop for the UI
+        Draws all UI elements and handles the mouse interactions
         """
         try:
             mx, my = pygame.mouse.get_pos()
@@ -643,7 +691,8 @@ class PygameUI:
             title_txt = self.font_lg.render("ThorCPY Control Panel", True, self.colors["text"])
             self.screen.blit(title_txt, (TITLE_MARGIN_X, TITLE_MARGIN_Y))
 
-            pygame.draw.line(self.screen, self.colors["border"], (TITLE_SEPARATOR_LEFT, TITLE_SEPARATOR_Y), (TITLE_SEPARATOR_RIGHT, TITLE_SEPARATOR_Y))
+            pygame.draw.line(self.screen, self.colors["border"], (TITLE_SEPARATOR_LEFT, TITLE_SEPARATOR_Y),
+                             (TITLE_SEPARATOR_RIGHT, TITLE_SEPARATOR_Y))
 
             # Layout controls header
             self.screen.blit(
@@ -665,7 +714,7 @@ class PygameUI:
                 "global_scale",
             )
 
-            # Restart notice for scale changes
+            # Restart notification for if the scale has changed
             if hasattr(self, "_scale_changed") and self._scale_changed:
                 restart_txt = self.font_sm.render(
                     "Restart ThorCPY to apply scale", True, self.colors["warning"]
@@ -674,16 +723,20 @@ class PygameUI:
 
             # Sliders
             self.draw_slider(
-                "TOP X", SLIDER_TOP_X_Y, self.l.tx, SCREEN_MIN_POS, SCREEN_MAX_POS, self.colors["top"], "tx"
+                "TOP X", SLIDER_TOP_X_Y, self.l.tx, SCREEN_MIN_POS, SCREEN_MAX_POS,
+                self.colors["top"], "tx"
             )
             self.draw_slider(
-                "TOP Y", SLIDER_TOP_Y_Y, self.l.ty, SCREEN_MIN_POS, SCREEN_MAX_POS, self.colors["top"], "ty"
+                "TOP Y", SLIDER_TOP_Y_Y, self.l.ty, SCREEN_MIN_POS, SCREEN_MAX_POS,
+                self.colors["top"], "ty"
             )
             self.draw_slider(
-                "BOTTOM X", SLIDER_BOTTOM_X_Y, self.l.bx, SCREEN_MIN_POS, SCREEN_MAX_POS, self.colors["bot"], "bx"
+                "BOTTOM X", SLIDER_BOTTOM_X_Y, self.l.bx, SCREEN_MIN_POS, SCREEN_MAX_POS,
+                self.colors["bot"], "bx"
             )
             self.draw_slider(
-                "BOTTOM Y", SLIDER_BOTTOM_Y_Y, self.l.by, SCREEN_MIN_POS, SCREEN_MAX_POS, self.colors["bot"], "by"
+                "BOTTOM Y", SLIDER_BOTTOM_Y_Y, self.l.by, SCREEN_MIN_POS, SCREEN_MAX_POS,
+                self.colors["bot"], "by"
             )
 
             # Undock/Dock Button
@@ -710,7 +763,8 @@ class PygameUI:
                 self.pressed_button = None
 
             # Screenshot Button
-            shot_btn = pygame.Rect(SCREENSHOT_BUTTON_X, SCREENSHOT_BUTTON_Y, SCREENSHOT_BUTTON_WIDTH, SCREENSHOT_BUTTON_HEIGHT)
+            shot_btn = pygame.Rect(SCREENSHOT_BUTTON_X, SCREENSHOT_BUTTON_Y, SCREENSHOT_BUTTON_WIDTH,
+                                   SCREENSHOT_BUTTON_HEIGHT)
             s_hover = shot_btn.collidepoint(mx, my)
 
             if self.l.docked:
@@ -749,7 +803,9 @@ class PygameUI:
                 status_txt = self.font_sm.render(self.status_msg, True, status_color)
                 self.screen.blit(status_txt, (STATUS_TEXT_X, STATUS_TEXT_Y))
 
-            pygame.draw.line(self.screen, self.colors["border"], (PRESET_DIVIDER_LEFT, PRESET_DIVIDER_Y), (PRESET_DIVIDER_RIGHT, PRESET_DIVIDER_Y))
+            # Presets
+            pygame.draw.line(self.screen, self.colors["border"], (PRESET_DIVIDER_LEFT, PRESET_DIVIDER_Y),
+                             (PRESET_DIVIDER_RIGHT, PRESET_DIVIDER_Y))
 
             # Save Preset button
             self.screen.blit(
@@ -771,10 +827,10 @@ class PygameUI:
             )
             self.screen.blit(name_txt, name_rect)
 
+            # Save button
             save_btn = pygame.Rect(PRESET_SAVE_BUTTON_X, PRESET_Y, PRESET_SAVE_BUTTON_WIDTH, PRESET_HEIGHT)
-            pygame.draw.rect(
-                self.screen, self.colors["accent"], save_btn, border_radius=PRESET_BORDER_RADIUS
-            )
+            pygame.draw.rect(self.screen, self.colors["accent"], save_btn, border_radius=PRESET_BORDER_RADIUS)
+
             sv_txt = self.font_md.render("SAVE", True, WHITE_TEXT)
             sv_rect = sv_txt.get_rect(center=save_btn.center)
             self.screen.blit(sv_txt, sv_rect)
@@ -799,18 +855,18 @@ class PygameUI:
                 self.screen.blit(name_txt, (PRESET_ROW_X + PRESET_NAME_X_OFFSET, name_y))
 
                 # Load button
-                l_btn = pygame.Rect(PRESET_LOAD_BUTTON_X, y_offset + PRESET_BUTTON_Y_OFFSET, PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT)
-                pygame.draw.rect(
-                    self.screen, self.colors["success"], l_btn, border_radius=BUTTON_BORDER_RADIUS
-                )
+                l_btn = pygame.Rect(PRESET_LOAD_BUTTON_X, y_offset + PRESET_BUTTON_Y_OFFSET, PRESET_BUTTON_WIDTH,
+                                    PRESET_BUTTON_HEIGHT)
+                pygame.draw.rect(self.screen, self.colors["success"], l_btn, border_radius=BUTTON_BORDER_RADIUS)
+
                 l_txt = self.font_sm.render("LOAD", True, BLACK_TEXT)
                 self.screen.blit(l_txt, l_txt.get_rect(center=l_btn.center))
 
                 # Delete Button
-                d_btn = pygame.Rect(PRESET_DELETE_BUTTON_X, y_offset + PRESET_BUTTON_Y_OFFSET, PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT)
-                pygame.draw.rect(
-                    self.screen, self.colors["danger"], d_btn, border_radius=BUTTON_BORDER_RADIUS
-                )
+                d_btn = pygame.Rect(PRESET_DELETE_BUTTON_X, y_offset + PRESET_BUTTON_Y_OFFSET, PRESET_BUTTON_WIDTH,
+                                    PRESET_BUTTON_HEIGHT)
+                pygame.draw.rect(self.screen, self.colors["danger"], d_btn, border_radius=BUTTON_BORDER_RADIUS)
+
                 d_txt = self.font_sm.render("DEL", True, WHITE_TEXT)
                 self.screen.blit(d_txt, d_txt.get_rect(center=d_btn.center))
 
@@ -819,13 +875,10 @@ class PygameUI:
                     if l_btn.collidepoint(mx, my):
                         logger.info(f"Loading preset: {name}")
 
-                        # Get preset's original scale
+                        # Scale positions if preset was created at a different scale
                         preset_scale = data.get("global_scale", self.l.launch_scale)
-                        current_scale = (
-                            self.l.launch_scale
-                        )  # Use actual window scale, not slider value
+                        current_scale = (self.l.launch_scale)
 
-                        # Scale positions if preset was created at different scale
                         if abs(preset_scale - current_scale) > SCALE_CHANGE_MIN_DETECTION:
                             scale_factor = current_scale / preset_scale
                             self.l.tx = int(data["tx"] * scale_factor)
@@ -871,8 +924,8 @@ class PygameUI:
                                 "by": self.l.by,
                                 "global_scale": self.l.launch_scale,
                             },
-                        )  # Save actual window scale
-                        self.invalidate_preset_cache()  # Refresh cache after save
+                        )
+                        self.invalidate_preset_cache()
                         self.show_status(f"Saved preset: {self.preset_name}", "success")
                         self.m_locked = True
                     except ValueError as PresetSaveFail:
@@ -886,6 +939,7 @@ class PygameUI:
                         self.show_status("Failed to save preset", "error")
                         self.m_locked = True
 
+            # Release mouse lock
             if not m_click:
                 self.m_locked = False
 
@@ -908,56 +962,32 @@ class PygameUI:
                 logger.warning("Cannot force sync - window handles not available")
                 return
 
-            # Reset the last sync time to bypass throttling
+            # Bypass throttling
             self.l.dock._last_sync = 0
 
-            # Ensure both windows are visible
             user32 = windll.user32
-
             logger.debug("Force syncing windows and ensuring visibility")
 
             # Show both windows
             user32.ShowWindow(self.l.dock.hwnd_top, SW_SHOW)
             user32.ShowWindow(self.l.dock.hwnd_bottom, SW_SHOW)
 
-            # Force immediate sync with new positions
+            # Apply new positions
             self.l.dock.sync(
-                self.l.tx,
-                self.l.ty,
-                self.l.bx,
-                self.l.by,
-                self.l.scrcpy.f_w1,
-                self.l.scrcpy.f_h1,
-                self.l.scrcpy.f_w2,
-                self.l.scrcpy.f_h2,
+                self.l.tx, self.l.ty, self.l.bx, self.l.by,
+                self.l.scrcpy.f_w1, self.l.scrcpy.f_h1,
+                self.l.scrcpy.f_w2, self.l.scrcpy.f_h2,
                 is_docked=True,
             )
 
+            # Force window style refresh
             user32.SetWindowPos(
-                self.l.dock.hwnd_top,
-                0,
-                0,
-                0,
-                0,
-                0,
-                SWP_NOZORDER
-                | SWP_NOACTIVATE
-                | SWP_FRAMECHANGED
-                | SWP_NOMOVE
-                | SWP_NOSIZE,
+                self.l.dock.hwnd_top, 0, 0, 0, 0, 0,
+                SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE,
             )
             user32.SetWindowPos(
-                self.l.dock.hwnd_bottom,
-                0,
-                0,
-                0,
-                0,
-                0,
-                SWP_NOZORDER
-                | SWP_NOACTIVATE
-                | SWP_FRAMECHANGED
-                | SWP_NOMOVE
-                | SWP_NOSIZE,
+                self.l.dock.hwnd_bottom, 0, 0, 0, 0, 0,
+                SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE,
             )
 
             logger.info("Force window sync completed successfully")
@@ -975,13 +1005,13 @@ class PygameUI:
         """
         try:
             if event.type == pygame.KEYDOWN:
-                # Slider Input
+                # Slider Keyboard Input
                 if self.active_slider_input:
                     if event.key == pygame.K_BACKSPACE:
                         self.input_buffer = self.input_buffer[:-1]
                     elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                         try:
-                            # Handle float for global_scale, int for others
+                            # Parse value based on slider data type
                             if self.active_slider_input == "global_scale":
                                 new_val = float(self.input_buffer)
                                 if abs(new_val - self._original_scale) > SCALE_CHANGE_MIN_DETECTION:
@@ -994,7 +1024,7 @@ class PygameUI:
                                 f"Slider {self.active_slider_input} set to {new_val} via input box"
                             )
 
-                            # Save scale separately for global_scale, layout for others
+                            # Save + sync
                             if self.active_slider_input == "global_scale":
                                 self.l.save_scale()
                             else:
@@ -1002,16 +1032,17 @@ class PygameUI:
                                 self.force_window_sync()
                         except ValueError:
                             logger.warning(f"Invalid slider input: {self.input_buffer}")
-                            self.show_status("Invalid number", "error", duration=SLIDER_ERROR_STATUS_DURATION)
+                            self.show_status("Invalid number", "error",
+                                             duration=SLIDER_ERROR_STATUS_DURATION)
                         except Exception as SliderValueError:
                             logger.error(f"Error setting slider value: {SliderValueError}")
                         finally:
                             self.active_slider_input = None
-                    elif (
-                        event.unicode.isdigit()
+
+                    # Allow digits, negative signs and decimal points
+                    elif (event.unicode.isdigit()
                         or (event.unicode == "-" and len(self.input_buffer) == 0)
-                        or (event.unicode == "." and "." not in self.input_buffer)
-                    ):
+                        or (event.unicode == "." and "." not in self.input_buffer)):
                         self.input_buffer += event.unicode
 
                 # Preset Name Input
