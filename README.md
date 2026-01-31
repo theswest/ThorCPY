@@ -10,11 +10,11 @@ It features a layout editor, window docking, screenshots, and window moving.
 It launches two scrcpy windows (one for each display), and embeds them into a native windows container.
 Designed for screensharing, recording or livestreaming.
 
-**Unfortunately, ThorCPY only supports Windows 11. A workaround for Windows 10 is in the works, but the current release *will not* work on Windows 10.**
+**ThorCPY is primarily designed for Windows 11. It will work on Windows 10, however bugs may occur!**
 
 
-| Main UI                            | ThorCPY Screenshot                             |
-|------------------------------------|------------------------------------------------|
+| Main UI                             | ThorCPY Screenshot                             |
+|-------------------------------------|------------------------------------------------|
 | ![](assets/screenshots/main_ui.png) | ![](assets/screenshots/ThorCPY-Screenshot.png) |
 
 
@@ -99,6 +99,8 @@ Python Dependencies:
 
 Control Panel:
 - The ThorCPY control panel appears on the right hand side of your screen with the following controls:
+- Global Scale:
+    - Adjust the scale of the scrcpy outputs (requires restart)
 - Layout Adjustment:
 	- Top X/Top Y:
 		- Adjust position of top screen
@@ -128,14 +130,29 @@ Layouts/Presets:
         "tx": 0,
         "ty": 0,
         "bx": 251,
-        "by": 648
+        "by": 648,
+		"global_scale": 0.6
     },
     "Streaming": {
         "tx": 100,
         "ty": 50,
         "bx": 300,
-        "by": 700
+        "by": 700,
+		"global_scale": 0.3
     }
+}
+```
+
+Config:
+- More general config settings are saved in config/config.json
+- You can manually edit this file if needed:
+```json title:config.json
+{
+    "global_scale": 0.6,
+    "tx": 0,
+    "ty": 0,
+    "bx": 251,
+    "by": 648
 }
 ```
 
