@@ -303,13 +303,11 @@ def apply_undocked_style(hwnd):
 def set_foreground_with_attach(hwnd):
     """
     Safely set foreground window with thread attachment.
-    Enhanced for Windows 10 stability.
     """
     if not hwnd or not user32.IsWindow(hwnd):
         logger.warning(f"set_foreground_with_attach called with invalid hwnd: {hwnd}")
-        return
+        return False
 
-    # Attempt to set the foreground window
     try:
         logger.debug(f"Attempting to set foreground window: {hwnd}")
 
@@ -322,39 +320,55 @@ def set_foreground_with_attach(hwnd):
         if tid_cur == tid_target:
             logger.debug("Same thread - skipping AttachThreadInput")
             try:
-                user32.SetForegroundWindow(hwnd)
-                logger.info(f"Window {hwnd} brought to foreground (same thread)")
+                result = user32.SetForegroundWindow(hwnd)
+                if result:
+                    logger.info(f"Window {hwnd} brought to foreground (same thread)")
+                return bool(result)
             except Exception as ForegroundWindowError:
                 logger.error(f"Error setting foreground window (same thread): {ForegroundWindowError}",
                              exc_info=True)
-            return
+                return False
 
         # Validate target thread
         if not tid_target:
             logger.warning("Could not get the target window's thread ID")
-            return
+            return False
 
         # Try without attachment first (safer on Windows 10)
         try:
             result = user32.SetForegroundWindow(hwnd)
             if result:
-                logger.info(
-                    f"Window {hwnd} brought to foreground (no attachment needed)"
-                )
-                return
-        except Exception as ForegroundWindowError:
-            logger.error(f"Error setting foreground window: {ForegroundWindowError}")
-            pass
+                logger.info(f"Window {hwnd} brought to foreground (no attachment needed)")
+                return True
+        except Exception as e:
+            logger.debug(f"SetForegroundWindow without attachment failed: {e}")
 
-        # If that didn't work, try with attachment
+        # WINDOWS 10 CHECK - Be extra cautious
+        import sys
+        is_win10 = sys.getwindowsversion().build < 22000
+
+        if is_win10:
+            logger.debug("Windows 10 detected - using conservative foreground approach")
+            # On Windows 10, just try once without thread attachment
+            # to avoid stability issues
+            try:
+                user32.BringWindowToTop(hwnd)
+                user32.SetFocus(hwnd)
+                logger.info(f"Window {hwnd} focus attempt (Win10 safe mode)")
+                return True
+            except Exception as e:
+                logger.warning(f"Safe focus failed on Win10: {e}")
+                return False
+
+        # Windows 11+ - can try thread attachment
         attached = False
         attach_timeout = time.time() + THREAD_ATTACH_TIMEOUT
 
         try:
             attached = bool(user32.AttachThreadInput(tid_cur, tid_target, True))
             if not attached:
-                logger.warning("Failed to attach thread input - aborting")
-                return
+                logger.warning("Failed to attach thread input")
+                return False
 
             logger.debug("Thread input queues attached successfully")
 
@@ -365,31 +379,37 @@ def set_foreground_with_attach(hwnd):
                     user32.SetActiveWindow(hwnd)
                     user32.SetFocus(hwnd)
                     logger.info(f"Window {hwnd} brought to foreground (with attachment)")
+                    return True
                 except Exception as ForegroundWindowSetError:
-                    logger.error(f"Error setting foreground window {hwnd}: {ForegroundWindowSetError}",
-                                 exc_info=True)
+                    logger.error(f"Error setting foreground window: {ForegroundWindowSetError}")
+                    return False
 
         except Exception as ThreadAttachmentError:
             logger.warning(f"Error during thread attachment: {ThreadAttachmentError}")
+            return False
 
         finally:
-            # Always detach with multiple attempts
+            # CRITICAL: Always detach with multiple attempts and timeout
             if attached:
+                detach_success = False
                 for attempt in range(MAX_DETACH_ATTEMPTS):
                     try:
-                        detach_result = user32.AttachThreadInput(
-                            tid_cur, tid_target, False
-                        )
+                        # Add small delay before detach to prevent race condition
+                        time.sleep(DETACH_RETRY_DELAY)
+                        detach_result = user32.AttachThreadInput(tid_cur, tid_target, False)
                         if detach_result:
                             logger.debug(f"Thread input queues detached (attempt {attempt + 1})")
+                            detach_success = True
                             break
-                        else:
-                            time.sleep(DETACH_RETRY_DELAY)
-                    except Exception as DetatchmentError:
-                        logger.error(f"Detach attempt {attempt + 1} failed: {DetatchmentError}")
-                        if attempt == MAX_DETACH_ATTEMPTS - 1:
-                            logger.critical("Failed to detatch thread input - potential instability")
+                    except Exception as DetachError:
+                        logger.error(f"Detach attempt {attempt + 1} failed: {DetachError}")
+
+                if not detach_success:
+                    logger.critical("FAILED TO DETACH THREAD INPUT - SYSTEM MAY BE UNSTABLE")
+
+        return False
 
     except Exception as ForegroundAttachCriticalError:
         logger.error(f"Critical error in set_foreground_with_attach: {ForegroundAttachCriticalError}",
                      exc_info=True)
+        return False
